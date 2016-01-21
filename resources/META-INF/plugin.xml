@@ -1,17 +1,15 @@
 <idea-plugin version="2">
-  <id>com.your.company.unique.plugin.id</id>
-  <name>Plugin display name here</name>
+  <id>com.satamas.form.plugin</id>
+  <name>Form</name>
   <version>1.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+  <vendor email="se.atamas@gmail.com">Semyon Atamas</vendor>
 
   <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      <a href="https://github.com/vermaseren/form">Form</a> language support
     ]]></description>
 
   <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      Add change notes here.
     ]]>
   </change-notes>
 
@@ -25,7 +23,7 @@
   -->
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <fileTypeFactory implementation="com.form.plugin.FormFileTypeFactory"/>
   </extensions>
 
   <actions>
