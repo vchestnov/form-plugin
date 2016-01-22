@@ -6,6 +6,7 @@ import com.intellij.psi.tree.TokenSet;
 
 public interface FormTokens {
     IElementType WHITE_SPACE = TokenType.WHITE_SPACE;
+    FormToken LINE_COMMENT = new FormToken("LINE_COMMENT");
 
     FormKeywordToken SYMBOLS_KEYWORD = FormKeywordToken.keyword("Symbols");
     FormKeywordToken LOCAL_KEYWORD = FormKeywordToken.keyword("Local");

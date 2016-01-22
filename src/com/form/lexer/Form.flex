@@ -14,11 +14,13 @@ import com.intellij.psi.TokenType;
 %eof{  return;
 %eof}
 
+LINE_COMMENT="*"[^\n]*
 WHITE_SPACE_CHAR=[\ \n\t\f]
 
 %%
 
 ({WHITE_SPACE_CHAR})+ { return FormTokens.WHITE_SPACE; }
+^{LINE_COMMENT} { return FormTokens.LINE_COMMENT; }
 
 "Symbols" { return FormTokens.SYMBOLS_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
