@@ -24,6 +24,8 @@
 
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.form.plugin.FormFileTypeFactory"/>
+    <lang.syntaxHighlighterFactory language="Form" implementationClass="com.form.plugin.highlighter.FormSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="com.form.plugin.highlighter.FormColorSettingsPage"/>
   </extensions>
 
   <actions>
