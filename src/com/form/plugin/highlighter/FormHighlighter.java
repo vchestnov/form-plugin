@@ -1,5 +1,6 @@
 package com.form.plugin.highlighter;
 
+import com.form.lexer.FormHighlightingLexer;
 import com.form.lexer.FormLexer;
 import com.form.lexer.FormTokens;
 import com.intellij.lexer.Lexer;
@@ -18,7 +19,7 @@ public class FormHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public Lexer getHighlightingLexer() {
-        return new FormLexer();
+        return new FormHighlightingLexer();
     }
 
     @NotNull
@@ -34,5 +35,9 @@ public class FormHighlighter extends SyntaxHighlighterBase {
         fillMap(keys1, FormTokens.KEYWORDS, FormHighlightingColors.KEYWORD);
         keys1.put(FormTokens.LINE_COMMENT, FormHighlightingColors.LINE_COMMENT);
         keys1.put(FormTokens.INTEGER_LITERAL, FormHighlightingColors.NUMBER);
+        keys1.put(FormTokens.LPAR, FormHighlightingColors.PARENTHESIS);
+        keys1.put(FormTokens.RPAR, FormHighlightingColors.PARENTHESIS);
+        keys1.put(FormTokens.LBRACKET, FormHighlightingColors.BRACKETS);
+        keys1.put(FormTokens.RBRACKET, FormHighlightingColors.BRACKETS);
     }
 }

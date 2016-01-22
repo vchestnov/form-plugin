@@ -34,4 +34,15 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
 {INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }
 
+"("          { return FormTokens.LPAR      ; }
+")"          { return FormTokens.RPAR      ; }
+"["          { return FormTokens.LBRACKET  ; }
+"]"          { return FormTokens.RBRACKET  ; }
+"*"          { return FormTokens.MUL       ; }
+"+"          { return FormTokens.PLUS      ; }
+"-"          { return FormTokens.MINUS     ; }
+"/"          { return FormTokens.DIV       ; }
+"^"          { return FormTokens.POWER     ; }
+"="          { return FormTokens.EQ        ; }
+
 . { return TokenType.BAD_CHARACTER; }
