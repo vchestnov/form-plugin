@@ -33,5 +33,6 @@ public class FormHighlighter extends SyntaxHighlighterBase {
 
         fillMap(keys1, FormTokens.KEYWORDS, FormHighlightingColors.KEYWORD);
         keys1.put(FormTokens.LINE_COMMENT, FormHighlightingColors.LINE_COMMENT);
+        keys1.put(FormTokens.INTEGER_LITERAL, FormHighlightingColors.NUMBER);
     }
 }

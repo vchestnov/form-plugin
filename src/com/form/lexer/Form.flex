@@ -14,8 +14,13 @@ import com.intellij.psi.TokenType;
 %eof{  return;
 %eof}
 
+DIGIT=[0-9]
+
 LINE_COMMENT="*"[^\n]*
 WHITE_SPACE_CHAR=[\ \n\t\f]
+
+INTEGER_LITERAL={DECIMAL_INTEGER_LITERAL}
+DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
 %%
 
@@ -26,5 +31,7 @@ WHITE_SPACE_CHAR=[\ \n\t\f]
 "Local" { return FormTokens.LOCAL_KEYWORD; }
 "Print" { return FormTokens.PRINT_KEYWORD; }
 ".end" { return FormTokens.END_KEYWORD; }
+
+{INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }
 
 . { return TokenType.BAD_CHARACTER; }
