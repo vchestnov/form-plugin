@@ -15,6 +15,8 @@ public interface FormTokens {
     FormKeywordToken PRINT_KEYWORD = FormKeywordToken.keyword("Print");
     FormKeywordToken END_KEYWORD = FormKeywordToken.keyword(".end");
 
+    FormToken IDENTIFIER = new FormToken("IDENTIFIER");
+
     FormSingleValueToken LBRACKET = new FormSingleValueToken("LBRACKET", "[");
     FormSingleValueToken RBRACKET = new FormSingleValueToken("RBRACKET", "]");
     FormSingleValueToken LPAR = new FormSingleValueToken("LPAR", "(");
@@ -26,9 +28,14 @@ public interface FormTokens {
     FormSingleValueToken POWER = new FormSingleValueToken("POWER", "^");
     FormSingleValueToken EQ = new FormSingleValueToken("EQ", "=");
 
+    FormSingleValueToken COMMA = new FormSingleValueToken("COMMA", ",");
+    FormSingleValueToken SEMICOLON   = new FormSingleValueToken("SEMICOLON", ";");
+
     TokenSet KEYWORDS = TokenSet.create(SYMBOLS_KEYWORD, LOCAL_KEYWORD, PRINT_KEYWORD, END_KEYWORD);
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
+    TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);
+    TokenSet COMMENTS = TokenSet.create(LINE_COMMENT);
 
     TokenSet ALL_ASSIGNMENTS = TokenSet.create(EQ);
 }

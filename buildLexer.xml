@@ -34,7 +34,7 @@
     </macrodef>
 
     <target name="lexer">
-        <flex flexfile="${home}/src/com/form/lexer/Form.flex"
-              destdir="${home}/src/com/form/lexer/"/>
+        <flex flexfile="${home}/form-psi/src/com/form/lexer/Form.flex"
+              destdir="${home}/form-psi/src/com/form/lexer/"/>
     </target>
 </project>

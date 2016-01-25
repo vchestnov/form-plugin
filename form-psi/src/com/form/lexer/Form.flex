@@ -19,6 +19,9 @@ DIGIT=[0-9]
 LINE_COMMENT="*"[^\n]*
 WHITE_SPACE_CHAR=[\ \n\t\f]
 
+LETTER = [:letter:]
+IDENTIFIER={LETTER}*
+
 INTEGER_LITERAL={DECIMAL_INTEGER_LITERAL}
 DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
@@ -33,6 +36,7 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 ".end" { return FormTokens.END_KEYWORD; }
 
 {INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }
+{IDENTIFIER} { return FormTokens.IDENTIFIER; }
 
 "("          { return FormTokens.LPAR      ; }
 ")"          { return FormTokens.RPAR      ; }
@@ -44,5 +48,7 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "/"          { return FormTokens.DIV       ; }
 "^"          { return FormTokens.POWER     ; }
 "="          { return FormTokens.EQ        ; }
+","          { return FormTokens.COMMA     ; }
+";"          { return FormTokens.SEMICOLON ; }
 
 . { return TokenType.BAD_CHARACTER; }
