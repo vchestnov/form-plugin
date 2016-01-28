@@ -8,8 +8,11 @@ import static com.form.lexer.FormTokens.*;
 import static com.form.psi.FormElementTypes.*;
 
 public class FormParsing extends AbstractFormParsing {
+    private FormExpressionParsing expressionParsing;
+
     public FormParsing(PsiBuilder builder) {
         super(builder);
+        expressionParsing = new FormExpressionParsing(builder);
     }
 
     public void parseFile(IElementType root, PsiBuilder builder) {
@@ -24,10 +27,24 @@ public class FormParsing extends AbstractFormParsing {
         IElementType keywordToken = tt();
         if (keywordToken == SYMBOLS_KEYWORD) {
             parseSymbolsDeclarationStatement();
+        } else if(keywordToken == LOCAL_KEYWORD){
+            parseLocalDeclarationStatement();
         } else if (keywordToken == END_KEYWORD) {
             parseEndOfFileStatement();
         } else {
             errorAndAdvance("Expecting a statement");
+        }
+    }
+
+    private void parseLocalDeclarationStatement() {
+        assert at(LOCAL_KEYWORD);
+        advance();
+        if(at(IDENTIFIER)){
+            advance();
+            advance();
+            expressionParsing.parseExpression();
+        } else {
+            error("");
         }
     }
 

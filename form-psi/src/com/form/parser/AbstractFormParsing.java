@@ -1,7 +1,9 @@
 package com.form.parser;
 
+import com.form.lexer.FormToken;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 
 public class AbstractFormParsing {
     protected final PsiBuilder builder;
@@ -45,6 +47,52 @@ public class AbstractFormParsing {
         return false;
     }
 
+    /**
+     * Side-effect-free version of atSet()
+     */
+    protected boolean _atSet(IElementType... tokens) {
+        return _atSet(TokenSet.create(tokens));
+    }
+
+    /**
+     * Side-effect-free version of atSet()
+     */
+    protected boolean _atSet(TokenSet set) {
+        IElementType token = tt();
+        if (set.contains(token)) return true;
+        return false;
+    }
+
+    protected boolean atSet(IElementType... tokens) {
+        return atSet(TokenSet.create(tokens));
+    }
+
+    protected boolean atSet(TokenSet set) {
+        if (_atSet(set)) return true;
+//        IElementType token = tt();
+//        if (token == IDENTIFIER) {
+//            KtKeywordToken keywordToken = SOFT_KEYWORD_TEXTS.get(myBuilder.getTokenText());
+//            if (keywordToken != null && set.contains(keywordToken)) {
+//                myBuilder.remapCurrentToken(keywordToken);
+//                return true;
+//            }
+//        }
+//        else {
+//            // We know at this point that <code>set</code> does not contain <code>token</code>
+//            if (set.contains(IDENTIFIER) && token instanceof KtKeywordToken) {
+//                if (((KtKeywordToken) token).isSoft()) {
+//                    myBuilder.remapCurrentToken(IDENTIFIER);
+//                    return true;
+//                }
+//            }
+//        }
+        return false;
+    }
+
+    protected void error(String message) {
+        builder.error(message);
+    }
+
     protected boolean errorAndAdvance(String message) {
         return errorAndAdvance(message, 1);
     }
@@ -68,5 +116,19 @@ public class AbstractFormParsing {
 
     private boolean tokenMatches(IElementType token, IElementType expectation) {
         return token == expectation;
+    }
+
+    protected boolean expect(FormToken expectation, String message) {
+        if (at(expectation)) {
+            advance(); // expectation
+            return true;
+        }
+
+//        if (expectation == KtTokens.IDENTIFIER && "`".equals(myBuilder.getTokenText())) {
+//            advance();
+//        }
+
+        error(message);
+        return false;
     }
 }
