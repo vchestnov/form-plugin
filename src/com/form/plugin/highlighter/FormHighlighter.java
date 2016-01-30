@@ -1,8 +1,7 @@
 package com.form.plugin.highlighter;
 
-import com.form.lexer.FormHighlightingLexer;
-import com.form.lexer.FormLexer;
-import com.form.lexer.FormTokens;
+import com.form.lang.lexer.FormHighlightingLexer;
+import com.form.lang.lexer.FormTokens;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;

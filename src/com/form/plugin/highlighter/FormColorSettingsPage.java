@@ -1,6 +1,6 @@
 package com.form.plugin.highlighter;
 
-import com.form.plugin.FormLanguage;
+import com.form.idea.FormLanguage;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.OptionsBundle;

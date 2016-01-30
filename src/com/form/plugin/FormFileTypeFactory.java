@@ -1,5 +1,6 @@
 package com.form.plugin;
 
+import com.form.idea.FormFileType;
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;
 import org.jetbrains.annotations.NotNull;
