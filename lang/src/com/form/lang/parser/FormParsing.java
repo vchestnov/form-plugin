@@ -29,6 +29,8 @@ public class FormParsing extends AbstractFormParsing {
             parseSymbolsDeclarationStatement();
         } else if (keywordToken == LOCAL_KEYWORD) {
             parseLocalDeclarationStatement();
+        } else if (keywordToken == ID_KEYWORD) {
+            parseIdentifyStatement();
         } else if (keywordToken == END_KEYWORD) {
             parseEndOfFileStatement();
         } else if (keywordToken == PRINT_KEYWORD) {
@@ -36,6 +38,27 @@ public class FormParsing extends AbstractFormParsing {
         } else {
             errorAndAdvance("Expecting a statement");
         }
+    }
+
+    private void parseIdentifyStatement() {
+        assert at(ID_KEYWORD);
+        advance();
+
+        if (!at(IDENTIFIER)) {
+            error("Expecting an identifier");
+            return;
+        }
+        advance();
+
+        if (!at(EQ)) {
+            error("Expression must be declared");
+            return;
+        }
+        advance();
+
+        expressionParsing.parseExpression();
+
+        expect(SEMICOLON, "';' expected");
     }
 
     private void parsePrintStatement() {

@@ -12,6 +12,7 @@ public interface FormTokens {
 
     FormKeywordToken SYMBOLS_KEYWORD = FormKeywordToken.keyword("Symbols");
     FormKeywordToken LOCAL_KEYWORD = FormKeywordToken.keyword("Local");
+    FormKeywordToken ID_KEYWORD = FormKeywordToken.keyword("id");
     FormKeywordToken PRINT_KEYWORD = FormKeywordToken.keyword("Print");
     FormKeywordToken END_KEYWORD = FormKeywordToken.keyword(".end");
 
@@ -31,7 +32,7 @@ public interface FormTokens {
     FormSingleValueToken COMMA = new FormSingleValueToken("COMMA", ",");
     FormSingleValueToken SEMICOLON   = new FormSingleValueToken("SEMICOLON", ";");
 
-    TokenSet KEYWORDS = TokenSet.create(SYMBOLS_KEYWORD, LOCAL_KEYWORD, PRINT_KEYWORD, END_KEYWORD);
+    TokenSet KEYWORDS = TokenSet.create(SYMBOLS_KEYWORD, LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD, END_KEYWORD);
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);

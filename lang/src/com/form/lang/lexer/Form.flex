@@ -1,4 +1,4 @@
-package com.form.lexer;
+package com.form.lang.lexer;
 
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
@@ -32,6 +32,7 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
 "Symbols" { return FormTokens.SYMBOLS_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
+"id" { return FormTokens.ID_KEYWORD; }
 "Print" { return FormTokens.PRINT_KEYWORD; }
 ".end" { return FormTokens.END_KEYWORD; }
 

@@ -1,18 +1,15 @@
 // This is a generated file. Not intended for manual editing.
 package com.form.lang.parser;
 
-import com.form.lang.lexer.FormTokens;
-import com.form.lang.psi.FormElementTypes;
-import com.intellij.lang.PsiBuilder;
-
-import static com.intellij.lang.parser.GeneratedParserUtilBase.*;
-
-import com.intellij.psi.tree.IElementType;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.tree.TokenSet;
+import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
-import com.intellij.lang.LightPsiParser;
+import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
+
+import static com.intellij.lang.parser.GeneratedParserUtilBase.Builder;
+import static com.intellij.lang.parser.GeneratedParserUtilBase.ErrorState;
 
 @SuppressWarnings({"SimplifiableIfStatement", "UnusedAssignment"})
 public class FormParser implements PsiParser {
