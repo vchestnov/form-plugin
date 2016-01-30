@@ -39,13 +39,22 @@ public class FormParsing extends AbstractFormParsing {
     private void parseLocalDeclarationStatement() {
         assert at(LOCAL_KEYWORD);
         advance();
-        if(at(IDENTIFIER)){
-            advance();
-            advance();
-            expressionParsing.parseExpression();
-        } else {
-            error("");
+
+        if(!at(IDENTIFIER)) {
+            error("Expecting an identifier");
+            return;
         }
+        advance();
+
+        if(!at(EQ)){
+            error("Expression must be declared");
+            return;
+        }
+        advance();
+
+        expressionParsing.parseExpression();
+
+        expect(SEMICOLON, "';' expected");
     }
 
     private void parseEndOfFileStatement() {
@@ -71,7 +80,7 @@ public class FormParsing extends AbstractFormParsing {
             builder.advanceLexer();
         } else {
             builder.advanceLexer();
-            builder.error("Semicolon expected");
+            builder.error("';' expected");
         }
         symbolsDeclaration.done(FormElementTypes.SYMBOLS_DECLARATION);
     }

@@ -21,12 +21,13 @@ public class FormExpressionParsing extends AbstractFormParsing {
 
     public enum Precedence {
 
-        MULTIPLICATIVE(MUL, DIV){
+        EXPONENTIATION(POWER){
             @Override
             public void parseHigherPrecedence(FormExpressionParsing parser) {
                 parser.parseAtomicExpression();
             }
         },
+        MULTIPLICATIVE(MUL, DIV) ,
         ADDITIVE(PLUS, MINUS),
         ASSIGNMENT(EQ);
 
@@ -51,9 +52,8 @@ public class FormExpressionParsing extends AbstractFormParsing {
         }
 
         /**
-         *
          * @param operation the operation sign (e.g. PLUS or IS)
-         * @param parser the parser object
+         * @param parser    the parser object
          * @return node type of the result
          */
         public FormElementType parseRightHandSide(IElementType operation, FormExpressionParsing parser) {
@@ -80,11 +80,32 @@ public class FormExpressionParsing extends AbstractFormParsing {
     }
 
     private void parseAtomicExpression() {
-        if (at(IDENTIFIER)) {
+        if (at(LPAR)) {
+            parseParenthesizedExpression();
+        } else if (at(IDENTIFIER)) {
             parseSimpleNameExpression();
+        } else if (!parseLiteralConstant()) {
+            error("Expecting an element");
         }
     }
 
+    private void parseParenthesizedExpression() {
+        assert _at(LPAR);
+
+        PsiBuilder.Marker mark = mark();
+
+        advance(); // LPAR
+        if (at(RPAR)) {
+            error("Expecting an expression");
+        }
+        else {
+            parseExpression();
+        }
+
+        expect(RPAR, "Expecting ')'");
+
+        mark.done(PARENTHESIZED);
+    }
 
     public void parseSimpleNameExpression() {
         PsiBuilder.Marker simpleName = mark();
@@ -114,6 +135,21 @@ public class FormExpressionParsing extends AbstractFormParsing {
         }
 
         expression.drop();
+    }
+
+    private boolean parseLiteralConstant() {
+        if (at(INTEGER_LITERAL)) {
+            parseOneTokenExpression(INTEGER_CONSTANT);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private void parseOneTokenExpression(FormElementType type) {
+        PsiBuilder.Marker mark = mark();
+        advance();
+        mark.done(type);
     }
 
 }

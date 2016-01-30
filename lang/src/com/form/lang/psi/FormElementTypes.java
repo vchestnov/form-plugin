@@ -15,6 +15,7 @@ public interface FormElementTypes {
     FormElementType SYMBOLS_DECLARATION = new FormElementType("SYMBOLS_DECLARATION");
 
     FormElementType BINARY_EXPRESSION = new FormElementType("BINARY_EXPRESSION");
+    FormElementType PARENTHESIZED = new FormElementType("PARENTHESIZED_EXPRESSION");
     FormElementType REFERENCE_EXPRESSION = new FormElementType("FORM_REFERENCE_EXPRESSION");
     FormElementType OPERATION_REFERENCE = new FormElementType("OPERATION_REFERENCE_EXPRESSION");
     FormElementType INTEGER_CONSTANT   = new FormElementType("INTEGER_CONSTANT");
@@ -34,6 +35,8 @@ public interface FormElementTypes {
                 return new FormConstantExpression(node);
             } else if(type == OPERATION_REFERENCE){
                 return new FormOperationReferenceExpression(node);
+            } else if(type == PARENTHESIZED) {
+                return new FormParenthesizedExpression(node);
             }
             throw new AssertionError("Unknown element type: " + type);
         }

@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/form-plugin.iml" filepath="$PROJECT_DIR$/form-plugin.iml" />
       <module fileurl="file://$PROJECT_DIR$/lang/lang.iml" filepath="$PROJECT_DIR$/lang/lang.iml" />
       <module fileurl="file://$PROJECT_DIR$/lang-tests/lang-tests.iml" filepath="$PROJECT_DIR$/lang-tests/lang-tests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/util/util.iml" filepath="$PROJECT_DIR$/util/util.iml" />
     </modules>
   </component>
 </project>
