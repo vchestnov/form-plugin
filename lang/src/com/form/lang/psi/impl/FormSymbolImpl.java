@@ -11,15 +11,9 @@ import static com.form.lang.psi.FormElementTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.form.lang.psi.*;
 
-public class FormSymbolImpl extends ASTWrapperPsiElement implements FormSymbol {
+public class FormSymbolImpl extends FormElementImpl implements FormSymbol {
 
   public FormSymbolImpl(ASTNode node) {
     super(node);
   }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof FormVisitor) ((FormVisitor)visitor).visitSymbol(this);
-    else super.accept(visitor);
-  }
-
 }

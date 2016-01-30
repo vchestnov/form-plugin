@@ -9,15 +9,10 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.form.lang.psi.*;
 
-public class FormSymbolsDeclarationStatementImpl extends ASTWrapperPsiElement implements FormSymbolsDeclarationStatement {
+public class FormSymbolsDeclarationStatementImpl extends FormElementImpl implements FormSymbolsDeclarationStatement {
 
   public FormSymbolsDeclarationStatementImpl(ASTNode node) {
     super(node);
-  }
-
-  public void accept(@NotNull PsiElementVisitor visitor) {
-    if (visitor instanceof FormVisitor) ((FormVisitor)visitor).visitSymbolsList(this);
-    else super.accept(visitor);
   }
 
   @Override

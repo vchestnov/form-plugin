@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface FormSymbolsDeclarationStatement extends PsiElement {
+public interface FormSymbolsDeclarationStatement extends FormElement {
 
   @NotNull
   List<FormSymbol> getSymbolList();
