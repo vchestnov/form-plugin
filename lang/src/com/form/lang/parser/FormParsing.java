@@ -27,26 +27,36 @@ public class FormParsing extends AbstractFormParsing {
         IElementType keywordToken = tt();
         if (keywordToken == SYMBOLS_KEYWORD) {
             parseSymbolsDeclarationStatement();
-        } else if(keywordToken == LOCAL_KEYWORD){
+        } else if (keywordToken == LOCAL_KEYWORD) {
             parseLocalDeclarationStatement();
         } else if (keywordToken == END_KEYWORD) {
             parseEndOfFileStatement();
+        } else if (keywordToken == PRINT_KEYWORD) {
+            parsePrintStatement();
         } else {
             errorAndAdvance("Expecting a statement");
         }
+    }
+
+    private void parsePrintStatement() {
+        assert at(PRINT_KEYWORD);
+        PsiBuilder.Marker print = mark();
+        advance();
+        expect(SEMICOLON, "';' expected");
+        print.done(PRINT_STATEMENT);
     }
 
     private void parseLocalDeclarationStatement() {
         assert at(LOCAL_KEYWORD);
         advance();
 
-        if(!at(IDENTIFIER)) {
+        if (!at(IDENTIFIER)) {
             error("Expecting an identifier");
             return;
         }
         advance();
 
-        if(!at(EQ)){
+        if (!at(EQ)) {
             error("Expression must be declared");
             return;
         }

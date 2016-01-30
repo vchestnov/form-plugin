@@ -11,6 +11,8 @@ import com.intellij.psi.tree.IFileElementType;
 public interface FormElementTypes {
     IFileElementType FORM_FILE = new IFileElementType(FormLanguage.INSTANCE);
 
+    FormElementType PRINT_STATEMENT = new FormElementType("PRINT");
+
     FormElementType SYMBOL = new FormElementType("SYMBOL");
     FormElementType SYMBOLS_DECLARATION = new FormElementType("SYMBOLS_DECLARATION");
 
@@ -37,6 +39,8 @@ public interface FormElementTypes {
                 return new FormOperationReferenceExpression(node);
             } else if(type == PARENTHESIZED) {
                 return new FormParenthesizedExpression(node);
+            } else if(type == PRINT_STATEMENT) {
+                return new FormPrintStatement(node);
             }
             throw new AssertionError("Unknown element type: " + type);
         }
