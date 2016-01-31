@@ -34,9 +34,18 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 ^{LINE_COMMENT} { return FormTokens.LINE_COMMENT; }
 
 "Symbols" { return FormTokens.SYMBOLS_KEYWORD; }
+"Vectors" { return FormTokens.VECTORS_KEYWORD; }
+"Indices" { return FormTokens.INDICES_KEYWORD; }
+"Functions" { return FormTokens.FUNCTIONS_KEYWORD; }
+"CFunctions" { return FormTokens.CFUNCTIONS_KEYWORD; }
+"Tensors" { return FormTokens.TENSORS_KEYWORD; }
+"CTensors" { return FormTokens.CTENSORS_KEYWORD; }
+"NTensors" { return FormTokens.NTENSORS_KEYWORD; }
+"Set" { return FormTokens.SET_KEYWORD; }
+
+"Print" { return FormTokens.PRINT_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
 "id" { return FormTokens.ID_KEYWORD; }
-"Print" { return FormTokens.PRINT_KEYWORD; }
 ".end" { return FormTokens.END_KEYWORD; }
 
 {INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }

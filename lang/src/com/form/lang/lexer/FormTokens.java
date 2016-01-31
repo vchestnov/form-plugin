@@ -11,6 +11,15 @@ public interface FormTokens {
     FormToken INTEGER_LITERAL = new FormToken("INTEGER_LITERAL");
 
     FormKeywordToken SYMBOLS_KEYWORD = FormKeywordToken.keyword("Symbols");
+    FormKeywordToken FUNCTIONS_KEYWORD = FormKeywordToken.keyword("Functions");
+    FormKeywordToken CFUNCTIONS_KEYWORD = FormKeywordToken.keyword("CFunctions");
+    FormKeywordToken VECTORS_KEYWORD = FormKeywordToken.keyword("Vectors");
+    FormKeywordToken TENSORS_KEYWORD = FormKeywordToken.keyword("Tensors");
+    FormKeywordToken CTENSORS_KEYWORD = FormKeywordToken.keyword("CTensors");
+    FormKeywordToken NTENSORS_KEYWORD = FormKeywordToken.keyword("NTensors");
+    FormKeywordToken SET_KEYWORD = FormKeywordToken.keyword("Set");
+    FormKeywordToken INDICES_KEYWORD = FormKeywordToken.keyword("Indices");
+
     FormKeywordToken LOCAL_KEYWORD = FormKeywordToken.keyword("Local");
     FormKeywordToken ID_KEYWORD = FormKeywordToken.keyword("id");
     FormKeywordToken PRINT_KEYWORD = FormKeywordToken.keyword("Print");
@@ -32,7 +41,10 @@ public interface FormTokens {
     FormSingleValueToken COMMA = new FormSingleValueToken("COMMA", ",");
     FormSingleValueToken SEMICOLON   = new FormSingleValueToken("SEMICOLON", ";");
 
-    TokenSet KEYWORDS = TokenSet.create(SYMBOLS_KEYWORD, LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD, END_KEYWORD);
+    TokenSet KEYWORDS = TokenSet.create(
+            SYMBOLS_KEYWORD, FUNCTIONS_KEYWORD, CFUNCTIONS_KEYWORD, VECTORS_KEYWORD, TENSORS_KEYWORD, CTENSORS_KEYWORD,
+            NTENSORS_KEYWORD, SET_KEYWORD, INDICES_KEYWORD,
+            LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD, END_KEYWORD);
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);
