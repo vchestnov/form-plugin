@@ -19,9 +19,10 @@ DIGIT=[0-9]
 LINE_COMMENT="*"[^\n]*
 WHITE_SPACE_CHAR=[\ \n\t\f]
 
-LETTER = [:letter:]
+LETTER = [:letter:]|_
+IDENTIFIER_PART=[:digit:]|{LETTER}
 
-PLAIN_IDENTIFIER={LETTER}*
+PLAIN_IDENTIFIER={LETTER} {IDENTIFIER_PART}*
 ESCAPED_IDENTIFIER=\[[^\[\n]+\]
 IDENTIFIER={PLAIN_IDENTIFIER}|{ESCAPED_IDENTIFIER}
 
@@ -46,7 +47,13 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "Print" { return FormTokens.PRINT_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
 "id" { return FormTokens.ID_KEYWORD; }
-".end" { return FormTokens.END_KEYWORD; }
+
+
+".clear"    { return FormTokens.CLEAR_KEYWORD; }
+".store"    { return FormTokens.STORE_KEYWORD; }
+".global"   { return FormTokens.GLOBAL_KEYWORD; }
+".sort"     { return FormTokens.SORT_KEYWORD; }
+".end"      { return FormTokens.END_KEYWORD; }
 
 {INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }
 {IDENTIFIER} { return FormTokens.IDENTIFIER; }
@@ -63,5 +70,6 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "="          { return FormTokens.EQ        ; }
 ","          { return FormTokens.COMMA     ; }
 ";"          { return FormTokens.SEMICOLON ; }
+"?"          { return FormTokens.QUEST ; }
 
 . { return TokenType.BAD_CHARACTER; }

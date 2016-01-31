@@ -24,7 +24,7 @@ public class FormExpressionParsing extends AbstractFormParsing {
         EXPONENTIATION(POWER){
             @Override
             public void parseHigherPrecedence(FormExpressionParsing parser) {
-                parser.parseAtomicExpression();
+                parser.parsePostfixExpression();
             }
         },
         MULTIPLICATIVE(MUL, DIV) ,
@@ -79,14 +79,67 @@ public class FormExpressionParsing extends AbstractFormParsing {
         parseBinaryExpression(Precedence.ASSIGNMENT);
     }
 
-    private void parseAtomicExpression() {
+    private void parsePostfixExpression(){
+        PsiBuilder.Marker expression = mark();
+        parseAtomicExpression();
+        if (parseCallOrAccessSuffix()) {
+            expression.done(CALL_OR_ACCESS_EXPRESSION);
+        } else{
+            expression.drop();
+        }
+    }
+
+    public boolean parseCallOrAccessSuffix() {
+        if (at(LPAR)) {
+            parseValueArgumentList();
+            return true;
+        } else{
+            return false;
+        }
+    }
+
+    public void parseValueArgumentList() {
+        PsiBuilder.Marker list = mark();
+
+        if (expect(LPAR, "Expecting an argument list")) {
+            if (!at(RPAR)) {
+                while (true) {
+                    while (at(COMMA)) errorAndAdvance("Expecting an argument");
+                    PsiBuilder.Marker dummyIndex = mark();
+                    parseSimpleNameExpression();
+                    if(at(QUEST)) {
+                        advance();
+                        dummyIndex.done(DUMMY_INDEX);
+                    } else {
+                        dummyIndex.drop();
+                    }
+
+                    if (!at(COMMA)) break;
+                    advance(); // COMMA
+                    if (at(RPAR)) {
+                        error("Expecting an argument");
+                        break;
+                    }
+                }
+            }
+
+            expect(RPAR, "Expecting ')'");
+        }
+
+        list.done(ARGUMENT_LIST);
+    }
+
+    private boolean parseAtomicExpression() {
         if (at(LPAR)) {
             parseParenthesizedExpression();
         } else if (at(IDENTIFIER)) {
             parseSimpleNameExpression();
         } else if (!parseLiteralConstant()) {
             error("Expecting an element");
+            return false;
         }
+
+        return true;
     }
 
     private void parseParenthesizedExpression() {

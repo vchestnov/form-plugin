@@ -23,6 +23,11 @@ public interface FormTokens {
     FormKeywordToken LOCAL_KEYWORD = FormKeywordToken.keyword("Local");
     FormKeywordToken ID_KEYWORD = FormKeywordToken.keyword("id");
     FormKeywordToken PRINT_KEYWORD = FormKeywordToken.keyword("Print");
+
+    FormKeywordToken CLEAR_KEYWORD = FormKeywordToken.keyword(".clear");
+    FormKeywordToken STORE_KEYWORD = FormKeywordToken.keyword(".store");
+    FormKeywordToken GLOBAL_KEYWORD = FormKeywordToken.keyword(".global");
+    FormKeywordToken SORT_KEYWORD = FormKeywordToken.keyword(".sort");
     FormKeywordToken END_KEYWORD = FormKeywordToken.keyword(".end");
 
     FormToken IDENTIFIER = new FormToken("IDENTIFIER");
@@ -37,6 +42,7 @@ public interface FormTokens {
     FormSingleValueToken DIV = new FormSingleValueToken("DIV", "/");
     FormSingleValueToken POWER = new FormSingleValueToken("POWER", "^");
     FormSingleValueToken EQ = new FormSingleValueToken("EQ", "=");
+    FormSingleValueToken QUEST = new FormSingleValueToken("QUEST", "?");
 
     FormSingleValueToken COMMA = new FormSingleValueToken("COMMA", ",");
     FormSingleValueToken SEMICOLON   = new FormSingleValueToken("SEMICOLON", ";");
@@ -44,11 +50,17 @@ public interface FormTokens {
     TokenSet KEYWORDS = TokenSet.create(
             SYMBOLS_KEYWORD, FUNCTIONS_KEYWORD, CFUNCTIONS_KEYWORD, VECTORS_KEYWORD, TENSORS_KEYWORD, CTENSORS_KEYWORD,
             NTENSORS_KEYWORD, SET_KEYWORD, INDICES_KEYWORD,
-            LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD, END_KEYWORD);
+            END_KEYWORD, SORT_KEYWORD, GLOBAL_KEYWORD, STORE_KEYWORD, CLEAR_KEYWORD,
+            LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD);
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);
     TokenSet COMMENTS = TokenSet.create(LINE_COMMENT);
+
+    TokenSet TYPES = TokenSet.create(SYMBOLS_KEYWORD, FUNCTIONS_KEYWORD, CFUNCTIONS_KEYWORD, VECTORS_KEYWORD, TENSORS_KEYWORD, CTENSORS_KEYWORD,
+            NTENSORS_KEYWORD, SET_KEYWORD, INDICES_KEYWORD);
+
+    TokenSet MODULE_INSTRUCTIONS = TokenSet.create(END_KEYWORD, SORT_KEYWORD, GLOBAL_KEYWORD, STORE_KEYWORD, CLEAR_KEYWORD);
 
     TokenSet ALL_ASSIGNMENTS = TokenSet.create(EQ);
 }
