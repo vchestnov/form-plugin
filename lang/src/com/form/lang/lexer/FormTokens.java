@@ -24,6 +24,11 @@ public interface FormTokens {
     FormKeywordToken ID_KEYWORD = FormKeywordToken.keyword("id");
     FormKeywordToken PRINT_KEYWORD = FormKeywordToken.keyword("Print");
 
+    FormKeywordToken IF_KEYWORD = FormKeywordToken.keyword("if");
+    FormKeywordToken ELSEIF_KEYWORD = FormKeywordToken.keyword("elseif");
+    FormKeywordToken ELSE_KEYWORD = FormKeywordToken.keyword("else");
+    FormKeywordToken ENDIF_KEYWORD = FormKeywordToken.keyword("endif");
+
     FormKeywordToken CLEAR_KEYWORD = FormKeywordToken.keyword(".clear");
     FormKeywordToken STORE_KEYWORD = FormKeywordToken.keyword(".store");
     FormKeywordToken GLOBAL_KEYWORD = FormKeywordToken.keyword(".global");
@@ -42,6 +47,7 @@ public interface FormTokens {
     FormSingleValueToken DIV = new FormSingleValueToken("DIV", "/");
     FormSingleValueToken POWER = new FormSingleValueToken("POWER", "^");
     FormSingleValueToken EQ = new FormSingleValueToken("EQ", "=");
+    FormSingleValueToken EQEQ = new FormSingleValueToken("EQEQ", "==");
     FormSingleValueToken QUEST = new FormSingleValueToken("QUEST", "?");
 
     FormSingleValueToken COMMA = new FormSingleValueToken("COMMA", ",");
@@ -51,7 +57,8 @@ public interface FormTokens {
             SYMBOLS_KEYWORD, FUNCTIONS_KEYWORD, CFUNCTIONS_KEYWORD, VECTORS_KEYWORD, TENSORS_KEYWORD, CTENSORS_KEYWORD,
             NTENSORS_KEYWORD, SET_KEYWORD, INDICES_KEYWORD,
             END_KEYWORD, SORT_KEYWORD, GLOBAL_KEYWORD, STORE_KEYWORD, CLEAR_KEYWORD,
-            LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD);
+            LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD,
+            IF_KEYWORD, ELSEIF_KEYWORD, ELSE_KEYWORD, ENDIF_KEYWORD);
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);

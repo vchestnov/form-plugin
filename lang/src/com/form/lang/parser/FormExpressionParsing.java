@@ -1,13 +1,13 @@
 package com.form.lang.parser;
 
-import com.form.lang.psi.FormElementType;
+import com.form.lang.FormNodeType;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
 import static com.form.lang.lexer.FormTokens.*;
-import static com.form.lang.psi.FormElementTypes.*;
+import static com.form.lang.FormNodeTypes.*;
 
 public class FormExpressionParsing extends AbstractFormParsing {
     static final TokenSet EXPRESSION_FIRST = TokenSet.create(
@@ -29,6 +29,7 @@ public class FormExpressionParsing extends AbstractFormParsing {
         },
         MULTIPLICATIVE(MUL, DIV) ,
         ADDITIVE(PLUS, MINUS),
+        EQUALITY(EQEQ),
         ASSIGNMENT(EQ);
 
         static {
@@ -56,7 +57,7 @@ public class FormExpressionParsing extends AbstractFormParsing {
          * @param parser    the parser object
          * @return node type of the result
          */
-        public FormElementType parseRightHandSide(IElementType operation, FormExpressionParsing parser) {
+        public FormNodeType parseRightHandSide(IElementType operation, FormExpressionParsing parser) {
             parseHigherPrecedence(parser);
             return BINARY_EXPRESSION;
         }
@@ -106,7 +107,7 @@ public class FormExpressionParsing extends AbstractFormParsing {
                 while (true) {
                     while (at(COMMA)) errorAndAdvance("Expecting an argument");
                     PsiBuilder.Marker dummyIndex = mark();
-                    parseSimpleNameExpression();
+                    parseAtomicExpression();
                     if(at(QUEST)) {
                         advance();
                         dummyIndex.done(DUMMY_INDEX);
@@ -182,7 +183,7 @@ public class FormExpressionParsing extends AbstractFormParsing {
 
             parseOperationReference();
 
-            FormElementType resultType = precedence.parseRightHandSide(operation, this);
+            FormNodeType resultType = precedence.parseRightHandSide(operation, this);
             expression.done(resultType);
             expression = expression.precede();
         }
@@ -199,7 +200,7 @@ public class FormExpressionParsing extends AbstractFormParsing {
         return true;
     }
 
-    private void parseOneTokenExpression(FormElementType type) {
+    private void parseOneTokenExpression(FormNodeType type) {
         PsiBuilder.Marker mark = mark();
         advance();
         mark.done(type);

@@ -1,12 +1,12 @@
 package com.form.lang.parser;
 
-import com.form.lang.psi.FormElementTypes;
+import com.form.lang.FormNodeTypes;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
 import static com.form.lang.lexer.FormTokens.*;
-import static com.form.lang.psi.FormElementTypes.*;
+import static com.form.lang.FormNodeTypes.*;
 
 public class FormParsing extends AbstractFormParsing {
     private FormExpressionParsing expressionParsing;
@@ -24,7 +24,7 @@ public class FormParsing extends AbstractFormParsing {
         while (!eof()) {
             parseStatement();
         }
-        rootMarker.done(FormElementTypes.FORM_FILE);
+        rootMarker.done(FormNodeTypes.FORM_FILE);
     }
 
     private void parseStatement() {
@@ -33,6 +33,8 @@ public class FormParsing extends AbstractFormParsing {
             parseDeclarationStatement();
         } else if (atSet(MODULE_INSTRUCTIONS)) {
             parseModuleInstruction();
+        } else if (at(IF_KEYWORD)) {
+            parseIfStatement();
         } else if (keywordToken == LOCAL_KEYWORD) {
             parseLocalDeclarationStatement();
         } else if (keywordToken == ID_KEYWORD) {
@@ -41,6 +43,49 @@ public class FormParsing extends AbstractFormParsing {
             parsePrintStatement();
         } else {
             errorAndAdvance("Expecting a statement");
+        }
+    }
+
+    private void parseIfStatement() {
+        assert at(IF_KEYWORD);
+        PsiBuilder.Marker marker = mark();
+
+        advance(); //IF_KEYWORD
+        parseCondition();
+        expect(SEMICOLON, "Expecting ';'");
+        parseIfBranch();
+
+        while(at(ELSEIF_KEYWORD) || at(ELSE_KEYWORD)) {
+            if(at(ELSEIF_KEYWORD)){
+                advance();
+                parseCondition();
+                expect(SEMICOLON, "Expecting ';'");
+            } else {
+                advance();
+                expect(SEMICOLON, "Expecting ';'");
+            }
+            parseIfBranch();
+        }
+
+        expect(ENDIF_KEYWORD, "Expecting endif statement");
+        expect(SEMICOLON, "Expecting ';'");
+        marker.done(IF);
+    }
+
+    private void parseIfBranch() {
+        PsiBuilder.Marker ifBranch = mark();
+        while (!at(ELSEIF_KEYWORD) && !at(ELSE_KEYWORD) && !at(ENDIF_KEYWORD)) {
+            parseStatement();
+        }
+        ifBranch.done(IF_BRANCH);
+    }
+
+    private void parseCondition() {
+        if (expect(LPAR, "Expecting a condition in parentheses '(...)'")) {
+            PsiBuilder.Marker condition = mark();
+            expressionParsing.parseExpression();
+            condition.done(CONDITION);
+            expect(RPAR, "Expecting ')");
         }
     }
 
@@ -78,7 +123,7 @@ public class FormParsing extends AbstractFormParsing {
             return;
         }
         advance();
-        if(expressionParsing.parseCallOrAccessSuffix()){
+        if (expressionParsing.parseCallOrAccessSuffix()) {
             access.done(CALL_OR_ACCESS_EXPRESSION);
         } else {
             access.drop();
@@ -107,7 +152,7 @@ public class FormParsing extends AbstractFormParsing {
             return;
         }
         advance();
-        if(expressionParsing.parseCallOrAccessSuffix()){
+        if (expressionParsing.parseCallOrAccessSuffix()) {
             access.done(CALL_OR_ACCESS_EXPRESSION);
         } else {
             access.drop();
@@ -130,7 +175,7 @@ public class FormParsing extends AbstractFormParsing {
         PsiBuilder.Marker instruction = mark();
         advance();
         instruction.done(MODULE_INSTRUCTION);
-        if(at(SEMICOLON)) advance();
+        if (at(SEMICOLON)) advance();
     }
 
     private void parseDeclarationStatement() {
@@ -148,7 +193,7 @@ public class FormParsing extends AbstractFormParsing {
             builder.advanceLexer();
             builder.error("';' expected");
         }
-        symbolsDeclaration.done(FormElementTypes.DECLARATION_STATEMENT);
+        symbolsDeclaration.done(FormNodeTypes.DECLARATION_STATEMENT);
     }
 
     private void parseSymbol() {

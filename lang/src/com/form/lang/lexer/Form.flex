@@ -44,6 +44,11 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "NTensors" { return FormTokens.NTENSORS_KEYWORD; }
 "Set" { return FormTokens.SET_KEYWORD; }
 
+"if" { return FormTokens.IF_KEYWORD; }
+"elseif" { return FormTokens.ELSEIF_KEYWORD; }
+"else" { return FormTokens.ELSE_KEYWORD; }
+"endif" { return FormTokens.ENDIF_KEYWORD; }
+
 "Print" { return FormTokens.PRINT_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
 "id" { return FormTokens.ID_KEYWORD; }
@@ -68,8 +73,9 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "/"          { return FormTokens.DIV       ; }
 "^"          { return FormTokens.POWER     ; }
 "="          { return FormTokens.EQ        ; }
+"=="         { return FormTokens.EQEQ      ; }
 ","          { return FormTokens.COMMA     ; }
 ";"          { return FormTokens.SEMICOLON ; }
-"?"          { return FormTokens.QUEST ; }
+"?"          { return FormTokens.QUEST     ; }
 
 . { return TokenType.BAD_CHARACTER; }

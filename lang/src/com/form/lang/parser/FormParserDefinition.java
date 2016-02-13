@@ -3,7 +3,7 @@ package com.form.lang.parser;
 import com.form.lang.lexer.FormLexer;
 import com.form.lang.lexer.FormTokens;
 import com.form.idea.FormLanguage;
-import com.form.lang.psi.FormElementTypes;
+import com.form.lang.FormNodeType;
 import com.form.lang.psi.FormFile;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
@@ -53,7 +53,8 @@ public class FormParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public PsiElement createElement(ASTNode node) {
-        return FormElementTypes.Factory.createElement(node);
+        FormNodeType elementType = (FormNodeType) node.getElementType();
+        return elementType.createPsi(node);
     }
 
     @Override

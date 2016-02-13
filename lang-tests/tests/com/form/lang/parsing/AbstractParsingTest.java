@@ -1,7 +1,7 @@
 package com.form.lang.parsing;
 
 import com.form.lang.parser.FormParserDefinition;
-import com.form.lang.psi.FormElementTypes;
+import com.form.lang.FormNodeTypes;
 import com.form.test.FormTestUtils;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.util.io.FileUtilRt;
@@ -21,7 +21,7 @@ public class AbstractParsingTest extends ParsingTestCase {
     }
 
     protected void doParsingTest(@NotNull String filePath) throws Exception {
-        doBaseTest(filePath, FormElementTypes.FORM_FILE);
+        doBaseTest(filePath, FormNodeTypes.FORM_FILE);
     }
 
     private void doBaseTest(@NotNull String filePath, @NotNull IElementType fileType) throws Exception {
