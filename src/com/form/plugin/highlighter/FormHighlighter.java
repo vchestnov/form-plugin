@@ -32,6 +32,7 @@ public class FormHighlighter extends SyntaxHighlighterBase {
         keys2 = new HashMap<>();
 
         fillMap(keys1, FormTokens.KEYWORDS, FormHighlightingColors.KEYWORD);
+        fillMap(keys1, FormTokens.DIRECTIVES, FormHighlightingColors.DIRECTIVE);
         keys1.put(FormTokens.LINE_COMMENT, FormHighlightingColors.LINE_COMMENT);
         keys1.put(FormTokens.INTEGER_LITERAL, FormHighlightingColors.NUMBER);
         keys1.put(FormTokens.LPAR, FormHighlightingColors.PARENTHESIS);

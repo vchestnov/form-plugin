@@ -55,7 +55,7 @@ public class FormParsing extends AbstractFormParsing {
         expect(SEMICOLON, "Expecting ';'");
         parseIfBranch();
 
-        while(at(ELSEIF_KEYWORD) || at(ELSE_KEYWORD)) {
+        while(atSet(ELSEIF_KEYWORD, ELSE_KEYWORD)) {
             if(at(ELSEIF_KEYWORD)){
                 advance();
                 parseCondition();
@@ -74,7 +74,7 @@ public class FormParsing extends AbstractFormParsing {
 
     private void parseIfBranch() {
         PsiBuilder.Marker ifBranch = mark();
-        while (!at(ELSEIF_KEYWORD) && !at(ELSE_KEYWORD) && !at(ENDIF_KEYWORD)) {
+        while (!eof() && !atSet(ELSEIF_KEYWORD, ELSE_KEYWORD, ENDIF_KEYWORD)) {
             parseStatement();
         }
         ifBranch.done(IF_BRANCH);

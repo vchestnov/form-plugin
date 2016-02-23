@@ -35,6 +35,11 @@ public interface FormTokens {
     FormKeywordToken SORT_KEYWORD = FormKeywordToken.keyword(".sort");
     FormKeywordToken END_KEYWORD = FormKeywordToken.keyword(".end");
 
+    FormPreprocessorDirectiveToken IF_DIRECTIVE = new FormPreprocessorDirectiveToken("#IF");
+    FormPreprocessorDirectiveToken ELSEIF_DIRECTIVE = new FormPreprocessorDirectiveToken("#ELSEIF");
+    FormPreprocessorDirectiveToken ELSE_DIRECTIVE = new FormPreprocessorDirectiveToken("#ELSE");
+    FormPreprocessorDirectiveToken ENDIF_DIRECTIVE = new FormPreprocessorDirectiveToken("#ENDIF");
+
     FormToken IDENTIFIER = new FormToken("IDENTIFIER");
 
     FormSingleValueToken LBRACKET = new FormSingleValueToken("LBRACKET", "[");
@@ -59,6 +64,10 @@ public interface FormTokens {
             END_KEYWORD, SORT_KEYWORD, GLOBAL_KEYWORD, STORE_KEYWORD, CLEAR_KEYWORD,
             LOCAL_KEYWORD, ID_KEYWORD, PRINT_KEYWORD,
             IF_KEYWORD, ELSEIF_KEYWORD, ELSE_KEYWORD, ENDIF_KEYWORD);
+
+    TokenSet DIRECTIVES = TokenSet.create(
+            IF_DIRECTIVE, ELSEIF_DIRECTIVE, ELSE_DIRECTIVE, ENDIF_DIRECTIVE);
+
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);

@@ -49,6 +49,11 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "else" { return FormTokens.ELSE_KEYWORD; }
 "endif" { return FormTokens.ENDIF_KEYWORD; }
 
+"#if" { return FormTokens.IF_DIRECTIVE; }
+"#elseif" { return FormTokens.ELSEIF_DIRECTIVE; }
+"#else" { return FormTokens.ELSE_DIRECTIVE; }
+"#endif" { return FormTokens.ENDIF_DIRECTIVE; }
+
 "Print" { return FormTokens.PRINT_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
 "id" { return FormTokens.ID_KEYWORD; }
