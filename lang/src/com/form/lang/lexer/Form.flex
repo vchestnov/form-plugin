@@ -14,6 +14,8 @@ import com.intellij.psi.TokenType;
 %eof{  return;
 %eof}
 
+%state STRING
+
 DIGIT=[0-9]
 
 LINE_COMMENT="*"[^\n]*
@@ -26,10 +28,18 @@ PLAIN_IDENTIFIER={LETTER} {IDENTIFIER_PART}*
 ESCAPED_IDENTIFIER=\[[^\[\n]+\]
 IDENTIFIER={PLAIN_IDENTIFIER}|{ESCAPED_IDENTIFIER}
 
+MACRO_REFERENCE="`"[~]?{IDENTIFIER}"'"
+
 INTEGER_LITERAL={DECIMAL_INTEGER_LITERAL}
 DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
+REGULAR_STRING_PART=[^\"`']+
+
 %%
+
+<YYINITIAL> \" { yybegin(STRING); return FormTokens.OPEN_QUOTE; }
+<STRING> \"  { yybegin(YYINITIAL); return FormTokens.CLOSING_QUOTE; }
+<STRING> {REGULAR_STRING_PART}  { return FormTokens.REGULAR_STRING_PART; }
 
 ({WHITE_SPACE_CHAR})+ { return FormTokens.WHITE_SPACE; }
 ^{LINE_COMMENT} { return FormTokens.LINE_COMMENT; }
@@ -49,10 +59,64 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 "else" { return FormTokens.ELSE_KEYWORD; }
 "endif" { return FormTokens.ENDIF_KEYWORD; }
 
-"#if" { return FormTokens.IF_DIRECTIVE; }
-"#elseif" { return FormTokens.ELSEIF_DIRECTIVE; }
+"#add" { return FormTokens.ADD_DIRECTIVE; }
+"#addseparator" { return FormTokens.ADDSEPARATOR_DIRECTIVE; }
+"#append" { return FormTokens.APPEND_DIRECTIVE; }
+"#break" { return FormTokens.BREAK_DIRECTIVE; }
+"#breakdo" { return FormTokens.BREAKDO_DIRECTIVE; }
+"#call" { return FormTokens.CALL_DIRECTIVE; }
+"#case" { return FormTokens.CASE_DIRECTIVE; }
+"#clearoptimize" { return FormTokens.CLEAROPTIMIZE_DIRECTIVE; }
+"#close" { return FormTokens.CLOSE_DIRECTIVE; }
+"#closedictionary" { return FormTokens.CLOSEDICTIONARY_DIRECTIVE; }
+"#commentchar" { return FormTokens.COMMENTCHAR_DIRECTIVE; }
+"#create" { return FormTokens.CREATE_DIRECTIVE; }
+"#default" { return FormTokens.DEFAULT_DIRECTIVE; }
+"#define" { return FormTokens.DEFINE_DIRECTIVE; }
+"#do" { return FormTokens.DO_DIRECTIVE; }
 "#else" { return FormTokens.ELSE_DIRECTIVE; }
+"#elseif" { return FormTokens.ELSEIF_DIRECTIVE; }
+"#enddo" { return FormTokens.ENDDO_DIRECTIVE; }
 "#endif" { return FormTokens.ENDIF_DIRECTIVE; }
+"#endinside" { return FormTokens.ENDINSIDE_DIRECTIVE; }
+"#endprocedure" { return FormTokens.ENDPROCEDURE_DIRECTIVE; }
+"#endswitch" { return FormTokens.ENDSWITCH_DIRECTIVE; }
+"#exchange" { return FormTokens.EXCHANGE_DIRECTIVE; }
+"#external" { return FormTokens.EXTERNAL_DIRECTIVE; }
+"#factdollar" { return FormTokens.FACTDOLLAR_DIRECTIVE; }
+"#fromexternal" { return FormTokens.FROMEXTERNAL_DIRECTIVE; }
+"#if" { return FormTokens.IF_DIRECTIVE; }
+"#ifdef" { return FormTokens.IFDEF_DIRECTIVE; }
+"#ifndef" { return FormTokens.IFNDEF_DIRECTIVE; }
+"#include" { return FormTokens.INCLUDE_DIRECTIVE; }
+"#inside" { return FormTokens.INSIDE_DIRECTIVE; }
+"#message" { return FormTokens.MESSAGE_DIRECTIVE; }
+"#opendictionary" { return FormTokens.OPENDICTIONARY_DIRECTIVE; }
+"#optimize" { return FormTokens.OPTIMIZE_DIRECTIVE; }
+"#pipe" { return FormTokens.PIPE_DIRECTIVE; }
+"#preout" { return FormTokens.PREOUT_DIRECTIVE; }
+"#printtimes" { return FormTokens.PRINTTIMES_DIRECTIVE; }
+"#procedure" { return FormTokens.PROCEDURE_DIRECTIVE; }
+"#procedureextension" { return FormTokens.PROCEDUREEXTENSION_DIRECTIVE; }
+"#prompt" { return FormTokens.PROMPT_DIRECTIVE; }
+"#redefine" { return FormTokens.REDEFINE_DIRECTIVE; }
+"#remove" { return FormTokens.REMOVE_DIRECTIVE; }
+"#reset" { return FormTokens.RESET_DIRECTIVE; }
+"#reverseinclude" { return FormTokens.REVERSEINCLUDE_DIRECTIVE; }
+"#rmexternal" { return FormTokens.RMEXTERNAL_DIRECTIVE; }
+"#rmseparator" { return FormTokens.RMSEPARATOR_DIRECTIVE; }
+"#setexternal" { return FormTokens.SETEXTERNAL_DIRECTIVE; }
+"#setexternalattr" { return FormTokens.SETEXTERNALATTR_DIRECTIVE; }
+"#setrandom" { return FormTokens.SETRANDOM_DIRECTIVE; }
+"#show" { return FormTokens.SHOW_DIRECTIVE; }
+"#skipextrasymbols" { return FormTokens.SKIPEXTRASYMBOLS_DIRECTIVE; }
+"#switch" { return FormTokens.SWITCH_DIRECTIVE; }
+"#system" { return FormTokens.SYSTEM_DIRECTIVE; }
+"#terminate" { return FormTokens.TERMINATE_DIRECTIVE; }
+"#toexternal" { return FormTokens.TOEXTERNAL_DIRECTIVE; }
+"#undefine" { return FormTokens.UNDEFINE_DIRECTIVE; }
+"#usedictionary" { return FormTokens.USEDICTIONARY_DIRECTIVE; }
+"#write" { return FormTokens.WRITE_DIRECTIVE; }
 
 "Print" { return FormTokens.PRINT_KEYWORD; }
 "Local" { return FormTokens.LOCAL_KEYWORD; }
@@ -67,6 +131,7 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
 {INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }
 {IDENTIFIER} { return FormTokens.IDENTIFIER; }
+{MACRO_REFERENCE} { return FormTokens.MACRO_REFERENCE; }
 
 "("          { return FormTokens.LPAR      ; }
 ")"          { return FormTokens.RPAR      ; }

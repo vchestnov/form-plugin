@@ -12,4 +12,5 @@ public class FormHighlightingColors {
     public static final TextAttributesKey NUMBER = createTextAttributesKey("FORM_NUMBER", DefaultLanguageHighlighterColors.NUMBER);
     public static final TextAttributesKey PARENTHESIS = createTextAttributesKey("FORM_PARENTHESIS", DefaultLanguageHighlighterColors.PARENTHESES);
     public static final TextAttributesKey BRACKETS = createTextAttributesKey("FORM_BRACKETS", DefaultLanguageHighlighterColors.BRACKETS);
+    public static final TextAttributesKey STRING = createTextAttributesKey("FORM_STRING", DefaultLanguageHighlighterColors.STRING);
 }

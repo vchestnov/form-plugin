@@ -19,6 +19,9 @@ public interface FormNodeTypes {
     FormNodeType CONDITION = new FormNodeType("CONDITION", FormElementImpl.class);
     FormNodeType IF_BRANCH = new FormNodeType("IF_BRANCH", FormElementImpl.class);
 
+    FormNodeType MACRO_DEFINITION = new FormNodeType("MACRO_DEFINITION", FormElementImpl.class);
+    FormNodeType STRING_LITERAL = new FormNodeType("STRING_LITERAL", FormElementImpl.class);
+
     FormNodeType BINARY_EXPRESSION = new FormNodeType("BINARY_EXPRESSION", FormBinaryExpressionImpl.class);
     FormNodeType CALL_OR_ACCESS_EXPRESSION = new FormNodeType("CALL_OR_ACCESS_EXPRESSION", FormCallOrAccessExpression.class);
     FormNodeType PARENTHESIZED = new FormNodeType("PARENTHESIZED_EXPRESSION", FormParenthesizedExpression.class);

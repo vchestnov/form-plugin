@@ -31,6 +31,8 @@ public class FormParsing extends AbstractFormParsing {
         IElementType keywordToken = tt();
         if (atSet(types)) {
             parseDeclarationStatement();
+        } else if (at(DEFINE_DIRECTIVE)) {
+            parseDefineDirective();
         } else if (atSet(MODULE_INSTRUCTIONS)) {
             parseModuleInstruction();
         } else if (at(IF_KEYWORD)) {
@@ -46,6 +48,40 @@ public class FormParsing extends AbstractFormParsing {
         }
     }
 
+    private void parseDefineDirective() {
+        assert at(DEFINE_DIRECTIVE);
+        PsiBuilder.Marker marker = mark();
+
+        advance();
+        if (at(IDENTIFIER)) {
+            advance();
+            if (at(LPAR)) {
+                expressionParsing.parseValueArgumentList();
+            }
+
+            parseStringLiteral();
+        }
+        marker.done(MACRO_DEFINITION);
+    }
+
+    private void parseStringLiteral() {
+        expect(OPEN_QUOTE, "\" expected");
+
+        PsiBuilder.Marker string = mark();
+        advance();
+        while(!eof() && !at(CLOSING_QUOTE)){
+            if(atSet(REGULAR_STRING_PART, MACRO_REFERENCE)){
+                advance();
+            } else {
+                errorAndAdvance("Unexpected element");
+            }
+        }
+        if(at(CLOSING_QUOTE)) {
+            advance();
+        }
+        string.done(STRING_LITERAL);
+    }
+
     private void parseIfStatement() {
         assert at(IF_KEYWORD);
         PsiBuilder.Marker marker = mark();
@@ -55,8 +91,8 @@ public class FormParsing extends AbstractFormParsing {
         expect(SEMICOLON, "Expecting ';'");
         parseIfBranch();
 
-        while(atSet(ELSEIF_KEYWORD, ELSE_KEYWORD)) {
-            if(at(ELSEIF_KEYWORD)){
+        while (atSet(ELSEIF_KEYWORD, ELSE_KEYWORD)) {
+            if (at(ELSEIF_KEYWORD)) {
                 advance();
                 parseCondition();
                 expect(SEMICOLON, "Expecting ';'");
