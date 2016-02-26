@@ -20,6 +20,8 @@ public interface FormNodeTypes {
     FormNodeType IF_BRANCH = new FormNodeType("IF_BRANCH", FormElementImpl.class);
 
     FormNodeType MACRO_DEFINITION = new FormNodeType("MACRO_DEFINITION", FormElementImpl.class);
+    FormNodeType MACRO_REDEFINITION = new FormNodeType("MACRO_REDEFINITION", FormElementImpl.class);
+    FormNodeType MACRO_UNDEFINITION = new FormNodeType("MACRO_UNDEFINITION", FormElementImpl.class);
     FormNodeType STRING_LITERAL = new FormNodeType("STRING_LITERAL", FormElementImpl.class);
 
     FormNodeType BINARY_EXPRESSION = new FormNodeType("BINARY_EXPRESSION", FormBinaryExpressionImpl.class);

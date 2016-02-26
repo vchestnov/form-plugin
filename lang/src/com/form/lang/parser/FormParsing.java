@@ -31,8 +31,10 @@ public class FormParsing extends AbstractFormParsing {
         IElementType keywordToken = tt();
         if (atSet(types)) {
             parseDeclarationStatement();
-        } else if (at(DEFINE_DIRECTIVE)) {
+        } else if (atSet(DEFINE_DIRECTIVE, REDEFINE_DIRECTIVE)) {
             parseDefineDirective();
+        } else if (at(UNDEFINE_DIRECTIVE)) {
+            parseUndefineDirective();
         } else if (atSet(MODULE_INSTRUCTIONS)) {
             parseModuleInstruction();
         } else if (at(IF_KEYWORD)) {
@@ -49,7 +51,8 @@ public class FormParsing extends AbstractFormParsing {
     }
 
     private void parseDefineDirective() {
-        assert at(DEFINE_DIRECTIVE);
+        assert atSet(DEFINE_DIRECTIVE, REDEFINE_DIRECTIVE);
+        IElementType headerToken = tt();
         PsiBuilder.Marker marker = mark();
 
         advance();
@@ -61,7 +64,24 @@ public class FormParsing extends AbstractFormParsing {
 
             parseStringLiteral();
         }
-        marker.done(MACRO_DEFINITION);
+        if(headerToken == DEFINE_DIRECTIVE){
+            marker.done(MACRO_DEFINITION);
+        } else {
+            marker.done(MACRO_REDEFINITION);
+        }
+    }
+
+    private void parseUndefineDirective() {
+        assert at(UNDEFINE_DIRECTIVE);
+        PsiBuilder.Marker marker = mark();
+
+        advance();
+        if (at(IDENTIFIER)) {
+            advance();
+        } else {
+            error("Identifier expected");
+        }
+        marker.done(MACRO_UNDEFINITION);
     }
 
     private void parseStringLiteral() {
@@ -69,14 +89,14 @@ public class FormParsing extends AbstractFormParsing {
 
         PsiBuilder.Marker string = mark();
         advance();
-        while(!eof() && !at(CLOSING_QUOTE)){
-            if(atSet(REGULAR_STRING_PART, MACRO_REFERENCE)){
+        while (!eof() && !at(CLOSING_QUOTE)) {
+            if (atSet(REGULAR_STRING_PART, MACRO_REFERENCE)) {
                 advance();
             } else {
                 errorAndAdvance("Unexpected element");
             }
         }
-        if(at(CLOSING_QUOTE)) {
+        if (at(CLOSING_QUOTE)) {
             advance();
         }
         string.done(STRING_LITERAL);
