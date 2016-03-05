@@ -15,6 +15,7 @@ import com.intellij.psi.TokenType;
 %eof}
 
 %state STRING
+%state DIRECTIVE
 
 DIGIT=[0-9]
 
@@ -35,11 +36,16 @@ DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
 REGULAR_STRING_PART=[^\"`']+
 
+DIRECTIVE_CONTENT=([^\n])*
+
 %%
 
-<YYINITIAL> \" { yybegin(STRING); return FormTokens.OPEN_QUOTE; }
+<DIRECTIVE> {DIRECTIVE_CONTENT} {return FormTokens.DIRECTIVE_CONTENT; }
+<DIRECTIVE> ({WHITE_SPACE_CHAR})+ { yybegin(YYINITIAL); return FormTokens.WHITE_SPACE; }
+
 <STRING> \"  { yybegin(YYINITIAL); return FormTokens.CLOSING_QUOTE; }
 <STRING> {REGULAR_STRING_PART}  { return FormTokens.REGULAR_STRING_PART; }
+<YYINITIAL> \" { yybegin(STRING); return FormTokens.OPEN_QUOTE; }
 
 ({WHITE_SPACE_CHAR})+ { return FormTokens.WHITE_SPACE; }
 ^{LINE_COMMENT} { return FormTokens.LINE_COMMENT; }
@@ -72,7 +78,7 @@ REGULAR_STRING_PART=[^\"`']+
 "#commentchar" { return FormTokens.COMMENTCHAR_DIRECTIVE; }
 "#create" { return FormTokens.CREATE_DIRECTIVE; }
 "#default" { return FormTokens.DEFAULT_DIRECTIVE; }
-"#define" { return FormTokens.DEFINE_DIRECTIVE; }
+"#define" { yybegin(DIRECTIVE); return FormTokens.DEFINE_DIRECTIVE; }
 "#do" { return FormTokens.DO_DIRECTIVE; }
 "#else" { return FormTokens.ELSE_DIRECTIVE; }
 "#elseif" { return FormTokens.ELSEIF_DIRECTIVE; }
@@ -148,4 +154,4 @@ REGULAR_STRING_PART=[^\"`']+
 ";"          { return FormTokens.SEMICOLON ; }
 "?"          { return FormTokens.QUEST     ; }
 
-. { return TokenType.BAD_CHARACTER; }
+<YYINITIAL, DIRECTIVE> . { yybegin(YYINITIAL); return TokenType.BAD_CHARACTER; }

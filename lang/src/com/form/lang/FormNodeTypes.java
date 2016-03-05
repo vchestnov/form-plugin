@@ -19,6 +19,7 @@ public interface FormNodeTypes {
     FormNodeType CONDITION = new FormNodeType("CONDITION", FormElementImpl.class);
     FormNodeType IF_BRANCH = new FormNodeType("IF_BRANCH", FormElementImpl.class);
 
+    FormNodeType DIRECTIVE = new FormNodeType("DIRECTIVE", FormElementImpl.class);
     FormNodeType MACRO_DEFINITION = new FormNodeType("MACRO_DEFINITION", FormElementImpl.class);
     FormNodeType MACRO_REDEFINITION = new FormNodeType("MACRO_REDEFINITION", FormElementImpl.class);
     FormNodeType MACRO_UNDEFINITION = new FormNodeType("MACRO_UNDEFINITION", FormElementImpl.class);

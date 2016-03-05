@@ -98,6 +98,8 @@ public interface FormTokens {
     FormToken IDENTIFIER = new FormToken("IDENTIFIER");
     FormToken MACRO_REFERENCE = new FormToken("MACRO_REFERENCE");
 
+    FormToken DIRECTIVE_CONTENT = new FormToken("DIRECTIVE_CONTENT");
+    FormToken END_OF_DIRECTIVE_CONTENT = new FormToken("END_OF_DIRECTIVE_CONTENT");
     FormToken CLOSING_QUOTE = new FormToken("CLOSING_QUOTE");
     FormToken OPEN_QUOTE = new FormToken("OPEN_QUOTE");
     FormToken REGULAR_STRING_PART = new FormToken("REGULAR_STRING_PART");

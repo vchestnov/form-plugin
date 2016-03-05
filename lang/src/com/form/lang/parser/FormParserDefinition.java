@@ -4,6 +4,8 @@ import com.form.lang.lexer.FormLexer;
 import com.form.lang.lexer.FormTokens;
 import com.form.idea.FormLanguage;
 import com.form.lang.FormNodeType;
+import com.form.lang.preprocessor.FormInclusionContext;
+import com.form.lang.preprocessor.FormPreprocessingLexer;
 import com.form.lang.psi.FormFile;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.ParserDefinition;
@@ -31,7 +33,8 @@ public class FormParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public Lexer createLexer(Project project) {
-        return new FormLexer();
+        FormInclusionContext inclusionContext = FormInclusionContext.empty();
+        return new FormPreprocessingLexer(inclusionContext);
     }
 
     @Override

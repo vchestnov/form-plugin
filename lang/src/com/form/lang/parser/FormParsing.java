@@ -64,7 +64,9 @@ public class FormParsing extends AbstractFormParsing {
 
             parseStringLiteral();
         }
-        if(headerToken == DEFINE_DIRECTIVE){
+        expect(END_OF_DIRECTIVE_CONTENT, "End of directive expected");
+
+        if (headerToken == DEFINE_DIRECTIVE) {
             marker.done(MACRO_DEFINITION);
         } else {
             marker.done(MACRO_REDEFINITION);
@@ -85,9 +87,14 @@ public class FormParsing extends AbstractFormParsing {
     }
 
     private void parseStringLiteral() {
-        expect(OPEN_QUOTE, "\" expected");
-
         PsiBuilder.Marker string = mark();
+        if(at(OPEN_QUOTE)){
+            advance();
+        } else {
+            error("\" expected");
+            string.drop();
+        }
+
         advance();
         while (!eof() && !at(CLOSING_QUOTE)) {
             if (atSet(REGULAR_STRING_PART, MACRO_REFERENCE)) {
