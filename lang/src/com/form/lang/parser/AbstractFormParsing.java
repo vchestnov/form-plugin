@@ -3,7 +3,6 @@ package com.form.lang.parser;
 import com.form.lang.lexer.FormToken;
 import com.form.lang.lexer.FormTokens;
 import com.intellij.lang.PsiBuilder;
-import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 
@@ -17,10 +16,6 @@ public class AbstractFormParsing {
         this.builder = builder;
     }
 
-    protected IElementType tt() {
-        return builder.getTokenType();
-    }
-
     protected boolean eof() {
         return builder.eof();
     }
@@ -30,28 +25,13 @@ public class AbstractFormParsing {
     }
 
     protected boolean _at(IElementType expectation) {
-        IElementType token = tt();
+        IElementType token = _tt();
         return tokenMatches(token, expectation);
     }
 
     protected boolean at(IElementType expectation) {
-        if (_at(expectation)) return true;
-//        IElementType token = tt();
-//        if (token == IDENTIFIER && expectation instanceof KtKeywordToken) {
-//            KtKeywordToken expectedKeyword = (KtKeywordToken) expectation;
-//            if (expectedKeyword.isSoft() && expectedKeyword.getValue().equals(myBuilder.getTokenText())) {
-//                myBuilder.remapCurrentToken(expectation);
-//                return true;
-//            }
-//        }
-//        if (expectation == IDENTIFIER && token instanceof KtKeywordToken) {
-//            KtKeywordToken keywordToken = (KtKeywordToken) token;
-//            if (keywordToken.isSoft()) {
-//                myBuilder.remapCurrentToken(IDENTIFIER);
-//                return true;
-//            }
-//        }
-        return false;
+        IElementType token = tt();
+        return tokenMatches(token, expectation);
     }
 
     /**
@@ -65,7 +45,7 @@ public class AbstractFormParsing {
      * Side-effect-free version of atSet()
      */
     protected boolean _atSet(TokenSet set) {
-        IElementType token = tt();
+        IElementType token = _tt();
         if (set.contains(token)) return true;
         return false;
     }
@@ -75,24 +55,8 @@ public class AbstractFormParsing {
     }
 
     protected boolean atSet(TokenSet set) {
-        if (_atSet(set)) return true;
-//        IElementType token = tt();
-//        if (token == IDENTIFIER) {
-//            KtKeywordToken keywordToken = SOFT_KEYWORD_TEXTS.get(myBuilder.getTokenText());
-//            if (keywordToken != null && set.contains(keywordToken)) {
-//                myBuilder.remapCurrentToken(keywordToken);
-//                return true;
-//            }
-//        }
-//        else {
-//            // We know at this point that <code>set</code> does not contain <code>token</code>
-//            if (set.contains(IDENTIFIER) && token instanceof KtKeywordToken) {
-//                if (((KtKeywordToken) token).isSoft()) {
-//                    myBuilder.remapCurrentToken(IDENTIFIER);
-//                    return true;
-//                }
-//            }
-//        }
+        IElementType token = tt();
+        if (set.contains(token)) return true;
         return false;
     }
 
@@ -116,14 +80,19 @@ public class AbstractFormParsing {
     }
 
     protected void advance() {
-        ProgressManager.checkCanceled();
+        builder.advanceLexer();
+    }
 
+    protected IElementType _tt() {
+        return builder.getTokenType();
+    }
+
+    protected IElementType tt() {
         IElementType token = builder.getTokenType();
         if (FormTokens.DIRECTIVES.contains(token)) {
             parseDirective();
         }
-
-        builder.advanceLexer();
+        return builder.getTokenType();
     }
 
     protected void parseDirective() {
@@ -155,7 +124,7 @@ public class AbstractFormParsing {
             } else if (_at(IDENTIFIER)) {
                 _advance();
 
-                if(_at(LPAR)) {
+                if (_at(LPAR)) {
                     final PsiBuilder.Marker paramList = mark();
                     _advance();
                     while (!eof() && tt() != RPAR) {

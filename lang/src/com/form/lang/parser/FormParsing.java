@@ -27,14 +27,14 @@ public class FormParsing extends AbstractFormParsing {
     }
 
     private void parseStatement() {
-        IElementType keywordToken = tt();
-        if (atSet(types)) {
+        IElementType keywordToken = _tt();
+        if (_atSet(types)) {
             parseDeclarationStatement();
         } else if (DIRECTIVES.contains(keywordToken)) {
             parseDirective();
-        } else if (atSet(MODULE_INSTRUCTIONS)) {
+        } else if (_atSet(MODULE_INSTRUCTIONS)) {
             parseModuleInstruction();
-        } else if (at(IF_KEYWORD)) {
+        } else if (_at(IF_KEYWORD)) {
             parseIfStatement();
         } else if (keywordToken == LOCAL_KEYWORD) {
             parseLocalDeclarationStatement();
