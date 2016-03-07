@@ -2,6 +2,7 @@ package com.form.lang.preprocessor;
 
 import gnu.trove.THashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -26,5 +27,14 @@ public class FormInclusionContext {
 
     private boolean canBeDefined(String name) {
         return name != null;
+    }
+
+    @Nullable
+    public FormMacroSymbol getDefinition(@Nullable String id) {
+        return mySubstitutions.get(id);
+    }
+
+    public boolean isDefined(@NotNull String identifier) {
+        return getDefinition(identifier) != null;
     }
 }

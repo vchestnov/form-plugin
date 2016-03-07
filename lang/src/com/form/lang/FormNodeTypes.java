@@ -21,8 +21,11 @@ public interface FormNodeTypes {
 
     FormNodeType DIRECTIVE = new FormNodeType("DIRECTIVE", FormElementImpl.class);
     FormNodeType MACRO_DEFINITION = new FormNodeType("MACRO_DEFINITION", FormElementImpl.class);
+    FormNodeType MACRO_PARAMETER_LIST = new FormNodeType("MACRO_PARAMETER_LIST", FormElementImpl.class);
+    FormNodeType MACRO_PARAMETER = new FormNodeType("MACRO_PARAMETER", FormElementImpl.class);
     FormNodeType MACRO_REDEFINITION = new FormNodeType("MACRO_REDEFINITION", FormElementImpl.class);
     FormNodeType MACRO_UNDEFINITION = new FormNodeType("MACRO_UNDEFINITION", FormElementImpl.class);
+    FormNodeType MACRO_REFERENCE = new FormNodeType("MACRO_REFERENCE", FormElementImpl.class);
     FormNodeType STRING_LITERAL = new FormNodeType("STRING_LITERAL", FormElementImpl.class);
 
     FormNodeType BINARY_EXPRESSION = new FormNodeType("BINARY_EXPRESSION", FormBinaryExpressionImpl.class);

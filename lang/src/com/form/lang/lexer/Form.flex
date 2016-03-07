@@ -29,8 +29,6 @@ PLAIN_IDENTIFIER={LETTER} {IDENTIFIER_PART}*
 ESCAPED_IDENTIFIER=\[[^\[\n]+\]
 IDENTIFIER={PLAIN_IDENTIFIER}|{ESCAPED_IDENTIFIER}
 
-MACRO_REFERENCE="`"[~]?{IDENTIFIER}"'"
-
 INTEGER_LITERAL={DECIMAL_INTEGER_LITERAL}
 DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
@@ -80,10 +78,10 @@ DIRECTIVE_CONTENT=([^\n])*
 "#default" { return FormTokens.DEFAULT_DIRECTIVE; }
 "#define" { yybegin(DIRECTIVE); return FormTokens.DEFINE_DIRECTIVE; }
 "#do" { return FormTokens.DO_DIRECTIVE; }
-"#else" { return FormTokens.ELSE_DIRECTIVE; }
+"#else" { yybegin(DIRECTIVE); return FormTokens.ELSE_DIRECTIVE; }
 "#elseif" { return FormTokens.ELSEIF_DIRECTIVE; }
 "#enddo" { return FormTokens.ENDDO_DIRECTIVE; }
-"#endif" { return FormTokens.ENDIF_DIRECTIVE; }
+"#endif" { yybegin(DIRECTIVE); return FormTokens.ENDIF_DIRECTIVE; }
 "#endinside" { return FormTokens.ENDINSIDE_DIRECTIVE; }
 "#endprocedure" { return FormTokens.ENDPROCEDURE_DIRECTIVE; }
 "#endswitch" { return FormTokens.ENDSWITCH_DIRECTIVE; }
@@ -92,8 +90,8 @@ DIRECTIVE_CONTENT=([^\n])*
 "#factdollar" { return FormTokens.FACTDOLLAR_DIRECTIVE; }
 "#fromexternal" { return FormTokens.FROMEXTERNAL_DIRECTIVE; }
 "#if" { return FormTokens.IF_DIRECTIVE; }
-"#ifdef" { return FormTokens.IFDEF_DIRECTIVE; }
-"#ifndef" { return FormTokens.IFNDEF_DIRECTIVE; }
+"#ifdef" { yybegin(DIRECTIVE); return FormTokens.IFDEF_DIRECTIVE; }
+"#ifndef" { yybegin(DIRECTIVE); return FormTokens.IFNDEF_DIRECTIVE; }
 "#include" { return FormTokens.INCLUDE_DIRECTIVE; }
 "#inside" { return FormTokens.INSIDE_DIRECTIVE; }
 "#message" { return FormTokens.MESSAGE_DIRECTIVE; }
@@ -137,7 +135,6 @@ DIRECTIVE_CONTENT=([^\n])*
 
 {INTEGER_LITERAL} { return FormTokens.INTEGER_LITERAL; }
 {IDENTIFIER} { return FormTokens.IDENTIFIER; }
-{MACRO_REFERENCE} { return FormTokens.MACRO_REFERENCE; }
 
 "("          { return FormTokens.LPAR      ; }
 ")"          { return FormTokens.RPAR      ; }
@@ -153,5 +150,8 @@ DIRECTIVE_CONTENT=([^\n])*
 ","          { return FormTokens.COMMA     ; }
 ";"          { return FormTokens.SEMICOLON ; }
 "?"          { return FormTokens.QUEST     ; }
+"`"          { return FormTokens.BACKQUOTE ; }
+"'"          { return FormTokens.QUOTE     ; }
+"~"          { return FormTokens.TYLDA     ; }
 
 <YYINITIAL, DIRECTIVE> . { yybegin(YYINITIAL); return TokenType.BAD_CHARACTER; }

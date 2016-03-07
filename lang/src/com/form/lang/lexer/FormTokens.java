@@ -7,6 +7,7 @@ import com.intellij.psi.tree.TokenSet;
 public interface FormTokens {
     IElementType WHITE_SPACE = TokenType.WHITE_SPACE;
     FormToken LINE_COMMENT = new FormToken("LINE_COMMENT");
+    FormToken CONDITIONALLY_NON_COMPILED_COMMENT = new FormToken("CONDITIONALLY_NON_COMPILED_COMMENT");
 
     FormToken INTEGER_LITERAL = new FormToken("INTEGER_LITERAL");
 
@@ -96,7 +97,6 @@ public interface FormTokens {
 
 
     FormToken IDENTIFIER = new FormToken("IDENTIFIER");
-    FormToken MACRO_REFERENCE = new FormToken("MACRO_REFERENCE");
 
     FormToken DIRECTIVE_CONTENT = new FormToken("DIRECTIVE_CONTENT");
     FormToken END_OF_DIRECTIVE_CONTENT = new FormToken("END_OF_DIRECTIVE_CONTENT");
@@ -116,6 +116,9 @@ public interface FormTokens {
     FormSingleValueToken EQ = new FormSingleValueToken("EQ", "=");
     FormSingleValueToken EQEQ = new FormSingleValueToken("EQEQ", "==");
     FormSingleValueToken QUEST = new FormSingleValueToken("QUEST", "?");
+    FormSingleValueToken TYLDA = new FormSingleValueToken("QUEST", "?");
+    FormSingleValueToken QUOTE = new FormSingleValueToken("QUOTE", "'");
+    FormSingleValueToken BACKQUOTE = new FormSingleValueToken("BACKQUOTE", "`");
 
     FormSingleValueToken COMMA = new FormSingleValueToken("COMMA", ",");
     FormSingleValueToken SEMICOLON = new FormSingleValueToken("SEMICOLON", ";");
@@ -140,10 +143,12 @@ public interface FormTokens {
             SKIPEXTRASYMBOLS_DIRECTIVE, SWITCH_DIRECTIVE, SYSTEM_DIRECTIVE, TERMINATE_DIRECTIVE, TOEXTERNAL_DIRECTIVE,
             UNDEFINE_DIRECTIVE, USEDICTIONARY_DIRECTIVE, WRITE_DIRECTIVE);
 
+    TokenSet END_IF_DIRECTIVES = TokenSet.create(ENDIF_DIRECTIVE, ELSE_DIRECTIVE, ELSEIF_DIRECTIVE);
+
     TokenSet OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet BINARY_OPERATIONS = TokenSet.create(PLUS, MINUS, MUL, DIV, POWER);
     TokenSet WHITESPACES = TokenSet.create(WHITE_SPACE);
-    TokenSet COMMENTS = TokenSet.create(LINE_COMMENT);
+    TokenSet COMMENTS = TokenSet.create(LINE_COMMENT, CONDITIONALLY_NON_COMPILED_COMMENT);
 
     TokenSet TYPES = TokenSet.create(SYMBOLS_KEYWORD, FUNCTIONS_KEYWORD, CFUNCTIONS_KEYWORD, VECTORS_KEYWORD, TENSORS_KEYWORD, CTENSORS_KEYWORD,
             NTENSORS_KEYWORD, SET_KEYWORD, INDICES_KEYWORD);

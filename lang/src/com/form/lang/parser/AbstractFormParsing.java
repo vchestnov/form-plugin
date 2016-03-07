@@ -1,9 +1,14 @@
 package com.form.lang.parser;
 
 import com.form.lang.lexer.FormToken;
+import com.form.lang.lexer.FormTokens;
 import com.intellij.lang.PsiBuilder;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+
+import static com.form.lang.FormNodeTypes.*;
+import static com.form.lang.lexer.FormTokens.*;
 
 public class AbstractFormParsing {
     protected final PsiBuilder builder;
@@ -20,7 +25,9 @@ public class AbstractFormParsing {
         return builder.eof();
     }
 
-    protected PsiBuilder.Marker mark() { return builder.mark(); }
+    protected PsiBuilder.Marker mark() {
+        return builder.mark();
+    }
 
     protected boolean _at(IElementType expectation) {
         IElementType token = tt();
@@ -104,8 +111,137 @@ public class AbstractFormParsing {
         return false;
     }
 
-    protected void advance() {
+    protected void _advance() {
         builder.advanceLexer();
+    }
+
+    protected void advance() {
+        ProgressManager.checkCanceled();
+
+        IElementType token = builder.getTokenType();
+        if (FormTokens.DIRECTIVES.contains(token)) {
+            parseDirective();
+        }
+
+        builder.advanceLexer();
+    }
+
+    protected void parseDirective() {
+        IElementType headerToken = builder.getTokenType();
+
+        assert DIRECTIVES.contains(headerToken);
+        final PsiBuilder.Marker marker = mark();
+        _advance();
+        if (headerToken == IFDEF_DIRECTIVE || headerToken == IFNDEF_DIRECTIVE) {
+            parseMacroReference();
+            while (!eof() && !isEndOfDirective(tt())) {
+                _advance();
+            }
+            _advance();
+            marker.done(DIRECTIVE);
+        } else if (headerToken == DEFINE_DIRECTIVE ||
+                headerToken == REDEFINE_DIRECTIVE ||
+                headerToken == UNDEFINE_DIRECTIVE) {
+
+            final IElementType tokenType = tt();
+            if (headerToken == UNDEFINE_DIRECTIVE) {
+                if (tokenType == IDENTIFIER) {
+                    PsiBuilder.Marker ref = mark();
+                    _advance();
+                    ref.done(MACRO_REFERENCE);
+                } else {
+                    error("Macro name expected");
+                }
+            } else if (_at(IDENTIFIER)) {
+                _advance();
+
+                if(_at(LPAR)) {
+                    final PsiBuilder.Marker paramList = mark();
+                    _advance();
+                    while (!eof() && tt() != RPAR) {
+                        if (tt() == IDENTIFIER) {
+                            PsiBuilder.Marker param = mark();
+                            _advance();
+                            param.done(MACRO_PARAMETER);
+                        } else {
+                            error("Expecting macro parameter");
+                            if (tt() != COMMA) _advance();
+                        }
+
+                        if (tt() == COMMA) {
+                            _advance();
+                        } else if (tt() != RPAR) {
+                            error("',' or ')' expected");
+                            break;
+                        }
+                    }
+                    expect(RPAR, "')' missing");
+                    paramList.done(MACRO_PARAMETER_LIST);
+                }
+                parseStringLiteral();
+            }
+
+            expect(END_OF_DIRECTIVE_CONTENT, "End of directive expected");
+            if (headerToken == DEFINE_DIRECTIVE) {
+                marker.done(MACRO_DEFINITION);
+            } else if (headerToken == REDEFINE_DIRECTIVE) {
+                marker.done(MACRO_REDEFINITION);
+            } else {
+                marker.done(UNDEFINE_DIRECTIVE);
+            }
+        } else {
+            while (!eof() && !isEndOfDirective(tt())) {
+                _advance();
+            }
+            _advance();
+            marker.done(DIRECTIVE);
+        }
+
+    }
+
+    private void parseStringLiteral() {
+        PsiBuilder.Marker string = mark();
+        if (at(OPEN_QUOTE)) {
+            _advance();
+        } else {
+            error("\" expected");
+            string.drop();
+            return;
+        }
+
+        while (!eof() && !_at(CLOSING_QUOTE)) {
+            if (atSet(REGULAR_STRING_PART, MACRO_REFERENCE)) {
+                _advance();
+            } else {
+                errorAndAdvance("Unexpected element");
+            }
+        }
+
+        if (at(CLOSING_QUOTE)) {
+            _advance();
+        }
+        string.done(STRING_LITERAL);
+    }
+
+    private static boolean isEndOfDirective(IElementType type) {
+        return type == END_OF_DIRECTIVE_CONTENT || type == DIRECTIVE_CONTENT;
+    }
+
+    protected void parseMacroReference() {
+        PsiBuilder.Marker marker = mark();
+        if (at(BACKQUOTE)) {
+            _advance();
+            if (at(TYLDA)) {
+                _advance();
+            }
+
+            expect(IDENTIFIER, "Macro name expected");
+            expect(QUOTE, "' expected");
+            marker.done(MACRO_REFERENCE);
+        } else {
+            error("Macro reference expected");
+            marker.drop();
+        }
     }
 
     protected void advance(int advanceTokenCount) {

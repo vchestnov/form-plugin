@@ -9,8 +9,7 @@ import static com.form.lang.lexer.FormTokens.*;
 import static com.form.lang.FormNodeTypes.*;
 
 public class FormParsing extends AbstractFormParsing {
-    private FormExpressionParsing expressionParsing;
-
+    protected FormExpressionParsing expressionParsing;
     TokenSet types = TokenSet.create(SYMBOLS_KEYWORD, VECTORS_KEYWORD, FUNCTIONS_KEYWORD, CFUNCTIONS_KEYWORD,
             TENSORS_KEYWORD, CTENSORS_KEYWORD, NTENSORS_KEYWORD, INDICES_KEYWORD);
 
@@ -31,10 +30,8 @@ public class FormParsing extends AbstractFormParsing {
         IElementType keywordToken = tt();
         if (atSet(types)) {
             parseDeclarationStatement();
-        } else if (atSet(DEFINE_DIRECTIVE, REDEFINE_DIRECTIVE)) {
-            parseDefineDirective();
-        } else if (at(UNDEFINE_DIRECTIVE)) {
-            parseUndefineDirective();
+        } else if (DIRECTIVES.contains(keywordToken)) {
+            parseDirective();
         } else if (atSet(MODULE_INSTRUCTIONS)) {
             parseModuleInstruction();
         } else if (at(IF_KEYWORD)) {
@@ -48,65 +45,6 @@ public class FormParsing extends AbstractFormParsing {
         } else {
             errorAndAdvance("Expecting a statement");
         }
-    }
-
-    private void parseDefineDirective() {
-        assert atSet(DEFINE_DIRECTIVE, REDEFINE_DIRECTIVE);
-        IElementType headerToken = tt();
-        PsiBuilder.Marker marker = mark();
-
-        advance();
-        if (at(IDENTIFIER)) {
-            advance();
-            if (at(LPAR)) {
-                expressionParsing.parseValueArgumentList();
-            }
-
-            parseStringLiteral();
-        }
-        expect(END_OF_DIRECTIVE_CONTENT, "End of directive expected");
-
-        if (headerToken == DEFINE_DIRECTIVE) {
-            marker.done(MACRO_DEFINITION);
-        } else {
-            marker.done(MACRO_REDEFINITION);
-        }
-    }
-
-    private void parseUndefineDirective() {
-        assert at(UNDEFINE_DIRECTIVE);
-        PsiBuilder.Marker marker = mark();
-
-        advance();
-        if (at(IDENTIFIER)) {
-            advance();
-        } else {
-            error("Identifier expected");
-        }
-        marker.done(MACRO_UNDEFINITION);
-    }
-
-    private void parseStringLiteral() {
-        PsiBuilder.Marker string = mark();
-        if(at(OPEN_QUOTE)){
-            advance();
-        } else {
-            error("\" expected");
-            string.drop();
-        }
-
-        advance();
-        while (!eof() && !at(CLOSING_QUOTE)) {
-            if (atSet(REGULAR_STRING_PART, MACRO_REFERENCE)) {
-                advance();
-            } else {
-                errorAndAdvance("Unexpected element");
-            }
-        }
-        if (at(CLOSING_QUOTE)) {
-            advance();
-        }
-        string.done(STRING_LITERAL);
     }
 
     private void parseIfStatement() {
