@@ -56,7 +56,14 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
                     skipConditionals(lexer, false)
                 }
             } else {
+                skipConditionals(lexer, true)
 
+                val tt = lexer.tokenType
+                if (tt === ELSE_DIRECTIVE) {
+                    skipDirectiveWithContent(lexer)
+
+                    processConditionals(lexer)
+                }
             }
         } else {
             addToken(lexer.tokenStart, END_OF_DIRECTIVE_CONTENT)
