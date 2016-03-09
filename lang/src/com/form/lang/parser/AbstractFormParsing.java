@@ -156,7 +156,7 @@ public class AbstractFormParsing {
             } else if (headerToken == REDEFINE_DIRECTIVE) {
                 marker.done(MACRO_REDEFINITION);
             } else {
-                marker.done(UNDEFINE_DIRECTIVE);
+                marker.done(MACRO_UNDEFINITION);
             }
         } else {
             while (!eof() && !isEndOfDirective(tt())) {

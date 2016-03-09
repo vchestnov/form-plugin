@@ -13,19 +13,26 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
 
     override fun lookAhead(baseLexer: Lexer) {
         val baseToken = baseLexer.tokenType
-        if (baseToken === DEFINE_DIRECTIVE) {
-            processDefineDirective(baseLexer)
+        if (baseToken === DEFINE_DIRECTIVE || baseToken === REDEFINE_DIRECTIVE) {
+            processDefineDirective(baseLexer, baseToken === REDEFINE_DIRECTIVE)
+        } else if (baseToken === UNDEFINE_DIRECTIVE) {
+            processUndefineDirective(baseLexer)
         } else if (baseToken == IFDEF_DIRECTIVE) {
             processIfDirective(baseLexer) { content: CharSequence ->
                 val identifier = content.toString().trim().removePrefix("`").removeSuffix("'")
                 myState.isDefined(identifier)
+            }
+        } else if (baseToken == IFNDEF_DIRECTIVE) {
+            processIfDirective(baseLexer) { content: CharSequence ->
+                val identifier = content.toString().trim().removePrefix("`").removeSuffix("'")
+                myState.isUndefined(identifier)
             }
         } else {
             super.lookAhead(baseLexer)
         }
     }
 
-    private fun processDefineDirective(baseLexer: Lexer) {
+    private fun processDefineDirective(baseLexer: Lexer, redefine: Boolean) {
         val offset = baseLexer.tokenStart
 
         advanceLexer(baseLexer)
@@ -34,10 +41,33 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             addTokensFromDirective(baseLexer, content)
             val def = FormMacroSymbol.parseFromDirectiveContent(content, offset)
             if (def != null) {
-                myState.define(def)
+                if (redefine) {
+                    myState.redefine(def)
+                } else {
+                    myState.define(def)
+                }
             }
         } else {
             addToken(baseLexer.tokenStart, END_OF_DIRECTIVE_CONTENT)
+        }
+    }
+
+    private fun processUndefineDirective(lexer: Lexer) {
+        advanceLexer(lexer)
+        if (atDirectiveContent(lexer)) {
+            val contents = LexerUtil.getTokenText(lexer)
+            addTokensFromDirective(lexer, contents)
+
+            val l = FormLexer()
+            l.start(contents)
+            while (WHITESPACES.contains(l.tokenType)) {
+                l.advance()
+            }
+            if (l.tokenType === IDENTIFIER) {
+                myState.undef(LexerUtil.getTokenText(l).toString())
+            }
+        } else {
+            addToken(lexer.tokenStart, END_OF_DIRECTIVE_CONTENT)
         }
     }
 
@@ -48,7 +78,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             val decision = decisionEvaluator(content)
             addTokensFromDirective(lexer, content)
 
-            if(decision){
+            if (decision) {
                 processConditionals(lexer)
                 val tt = lexer.tokenType
                 if (tt === ELSE_DIRECTIVE || tt === ELSEIF_DIRECTIVE) {
@@ -85,7 +115,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
         var nesting = 1
 
         while (WHITESPACES.contains(lexer.tokenType)) {
-//            adjustLineCount(LexerUtil.getTokenText(lexer))
+            //            adjustLineCount(LexerUtil.getTokenText(lexer))
             advanceAs(lexer, TokenType.WHITE_SPACE)
         }
 
@@ -102,7 +132,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             }
 
             if (WHITESPACES.contains(tt)) {
-//                adjustLineCount(LexerUtil.getTokenText(lexer))
+                //                adjustLineCount(LexerUtil.getTokenText(lexer))
             } else {
                 beforeEnd = lexer.currentPosition
             }
@@ -126,7 +156,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             if (tt === ELSEIF_DIRECTIVE) {
                 addTokensFromDirective(lexer, content)
             } else {
-//                adjustLineCount(content)
+                //                adjustLineCount(content)
                 advanceLexer(lexer)
             }
         } else {

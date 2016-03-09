@@ -103,7 +103,7 @@ DIRECTIVE_CONTENT=([^\n])*
 "#procedure" { return FormTokens.PROCEDURE_DIRECTIVE; }
 "#procedureextension" { return FormTokens.PROCEDUREEXTENSION_DIRECTIVE; }
 "#prompt" { return FormTokens.PROMPT_DIRECTIVE; }
-"#redefine" { return FormTokens.REDEFINE_DIRECTIVE; }
+"#redefine" { yybegin(DIRECTIVE); return FormTokens.REDEFINE_DIRECTIVE; }
 "#remove" { return FormTokens.REMOVE_DIRECTIVE; }
 "#reset" { return FormTokens.RESET_DIRECTIVE; }
 "#reverseinclude" { return FormTokens.REVERSEINCLUDE_DIRECTIVE; }
@@ -118,7 +118,7 @@ DIRECTIVE_CONTENT=([^\n])*
 "#system" { return FormTokens.SYSTEM_DIRECTIVE; }
 "#terminate" { return FormTokens.TERMINATE_DIRECTIVE; }
 "#toexternal" { return FormTokens.TOEXTERNAL_DIRECTIVE; }
-"#undefine" { return FormTokens.UNDEFINE_DIRECTIVE; }
+"#undefine" { yybegin(DIRECTIVE); return FormTokens.UNDEFINE_DIRECTIVE; }
 "#usedictionary" { return FormTokens.USEDICTIONARY_DIRECTIVE; }
 "#write" { return FormTokens.WRITE_DIRECTIVE; }
 
