@@ -30,8 +30,10 @@ public class FormInclusionContext {
 
     public void redefine(@NotNull FormMacroSymbol def) {
         String name = def.getName();
-        if (isUndefined(name)) return;
-        mySubstitutions.get(name).pop();
+        if (name == null) return;
+        if (!mySubstitutions.containsKey(name)) mySubstitutions.put(name, new Stack<>());
+        if (!mySubstitutions.get(name).isEmpty()) mySubstitutions.get(name).pop();
+        mySubstitutions.get(name).push(def);
     }
 
     public void undef(@Nullable String name) {
