@@ -6,14 +6,21 @@ import com.intellij.lexer.Lexer
 import com.intellij.lexer.LexerPosition
 import com.intellij.lexer.LexerUtil
 import com.intellij.lexer.LookAheadLexer
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.TokenType
+import com.intellij.psi.tree.IElementType
+import com.intellij.util.containers.hash.HashMap
+import java.util.*
 
 class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAheadLexer(FormLexer()) {
+    var macroLevel = 0
 
 
     override fun lookAhead(baseLexer: Lexer) {
         val baseToken = baseLexer.tokenType
-        if (baseToken === DEFINE_DIRECTIVE || baseToken === REDEFINE_DIRECTIVE) {
+        if (baseToken == BACKQUOTE) {
+            processMacroSubstitution(baseLexer)
+        } else if (baseToken === DEFINE_DIRECTIVE || baseToken === REDEFINE_DIRECTIVE) {
             processDefineDirective(baseLexer, baseToken === REDEFINE_DIRECTIVE)
         } else if (baseToken === UNDEFINE_DIRECTIVE) {
             processUndefineDirective(baseLexer)
@@ -29,6 +36,79 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             }
         } else {
             super.lookAhead(baseLexer)
+        }
+    }
+
+    private fun processMacroSubstitution(baseLexer: Lexer) {
+        skipMacroToken(baseLexer, false, false) //skip backquote
+
+        val macro: FormMacroSymbol?
+        if (baseLexer.tokenType == IDENTIFIER) {
+            val id = baseLexer.tokenText
+            macro = myState.getDefinition(id)
+            skipMacroToken(baseLexer, false, true)
+            buildSubstitutionArguments(baseLexer)
+        } else{
+            macro = null
+        }
+
+        if (baseLexer.tokenType == QUOTE) {
+            skipMacroToken(baseLexer, false, false)
+        }
+
+        if (macro != null) {
+            val substLexer = FormPreprocessingLexer(myState)
+            val substString = macro.substitution
+            substLexer.start(substString, 0, substString.length)
+            while (true) {
+                val type = substLexer.tokenType ?: break
+                if (WHITE_SPACES.contains(type)) {
+                    addToken(baseLexer.tokenStart, type)
+                } else {
+                    val tokenText = LexerUtil.getTokenText(substLexer)
+                    val leafNode = FormMacroForeignLeafType(type, tokenText, macro.name)
+                    addToken(baseLexer.tokenStart, leafNode)
+                }
+                substLexer.advance()
+            }
+        }
+    }
+
+    private fun buildSubstitutionArguments(baseLexer: Lexer): List<String>? {
+        val args = ArrayList<String>()
+        val pos = baseLexer.currentPosition // save, ( can absent
+
+        // go ahead for (
+        while (WHITE_SPACES.contains(baseLexer.tokenType)) {
+            baseLexer.advance()
+        }
+
+        if (baseLexer.tokenType === LPAR) {
+            skipMacroToken(baseLexer, false, false) // skip LPAR
+
+            val builder = StringBuilder()
+
+            while (true) {
+                val tt = baseLexer.tokenType
+                if (tt == null || tt == RPAR) break
+
+                if (tt === COMMA) {
+                    args.add(builder.toString())
+                    builder.setLength(0)
+                    skipMacroToken(baseLexer, false, false) // skip COMMA
+                } else {
+                    var text = LexerUtil.getTokenText(baseLexer)
+                    builder.append(text)
+                    skipMacroToken(baseLexer, true, false)
+                }
+            }
+
+            args.add(builder.toString())
+            skipMacroToken(baseLexer, false, false)
+            return args
+        } else {
+            baseLexer.restore(pos)
+            return null
         }
     }
 
@@ -52,6 +132,16 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
         }
     }
 
+    private fun buildParameterSubstitutionMap(parameterNames: List<String>?, args: List<String>?): Map<String, String> {
+        if (parameterNames == null || parameterNames.size == 0) return emptyMap()
+
+        val paramSubst = HashMap<String, String>()
+        parameterNames.forEachIndexed { ind, name ->
+            paramSubst.put(name, args?.getOrNull(ind) ?: "")
+        }
+        return paramSubst
+    }
+
     private fun processUndefineDirective(lexer: Lexer) {
         advanceLexer(lexer)
         if (atDirectiveContent(lexer)) {
@@ -60,7 +150,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
 
             val l = FormLexer()
             l.start(contents)
-            while (WHITESPACES.contains(l.tokenType)) {
+            while (WHITE_SPACES.contains(l.tokenType)) {
                 l.advance()
             }
             if (l.tokenType === IDENTIFIER) {
@@ -111,10 +201,28 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
         }
     }
 
+    private fun skipMacroToken(baseLexer: Lexer, isParamToken: Boolean, isRoot: Boolean): FormMacroReferenceTokenType? {
+        var result: FormMacroReferenceTokenType? = null
+        val baseToken = baseLexer.tokenType
+        if (baseToken != null) {
+            if (WHITE_SPACES.contains(baseToken)) {
+                advanceAs(baseLexer, baseToken) // whitespaces have the special logic for re-balancing in PsiBuilderImpl
+            } else {
+                val text = LexerUtil.getTokenText(baseLexer)
+                val preprocessed: IElementType
+                preprocessed = if (isRoot && (KEYWORDS.contains(baseToken))) IDENTIFIER else baseToken
+                result = FormMacroReferenceTokenType(preprocessed, text, isParamToken, macroLevel, isRoot)
+                advanceAs(baseLexer, result)
+            }
+        }
+
+        return result
+    }
+
     private fun skipConditionals(lexer: Lexer, stopOnElse: Boolean) {
         var nesting = 1
 
-        while (WHITESPACES.contains(lexer.tokenType)) {
+        while (WHITE_SPACES.contains(lexer.tokenType)) {
             //            adjustLineCount(LexerUtil.getTokenText(lexer))
             advanceAs(lexer, TokenType.WHITE_SPACE)
         }
@@ -131,7 +239,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
                 if (tt !== ENDIF_DIRECTIVE) nesting++
             }
 
-            if (WHITESPACES.contains(tt)) {
+            if (WHITE_SPACES.contains(tt)) {
                 //                adjustLineCount(LexerUtil.getTokenText(lexer))
             } else {
                 beforeEnd = lexer.currentPosition
@@ -145,7 +253,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             advanceAs(lexer, CONDITIONALLY_NON_COMPILED_COMMENT)
         }
 
-        while (WHITESPACES.contains(lexer.tokenType)) advanceAs(lexer, TokenType.WHITE_SPACE)
+        while (WHITE_SPACES.contains(lexer.tokenType)) advanceAs(lexer, TokenType.WHITE_SPACE)
     }
 
     private fun skipDirectiveWithContent(lexer: Lexer) {
@@ -185,5 +293,30 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
     private fun atDirectiveContent(lexer: Lexer): Boolean {
         val tt = lexer.tokenType
         return tt === DIRECTIVE_CONTENT
+    }
+
+    private class SubstitutionResult {
+        private val _string = StringBuilder()
+        val string: String
+            get() = _string.toString()
+
+        private val _substitutions = ArrayList<Pair<Int, TextRange>>()
+        val substitutions: List<Pair<Int, TextRange>> = _substitutions
+
+        fun append(string: String) {
+            _string.append(string)
+        }
+
+        private fun addSubstitution(argumentIndex: Int, substLength: Int) {
+            _substitutions.add(Pair(argumentIndex, TextRange(_string.length, _string.length + substLength)))
+        }
+
+        fun removeLastComma() {
+            var lastIndex = _string.length - 1
+            while (lastIndex >= 0 && _string[lastIndex] == ' ') lastIndex--
+            if (lastIndex >= 0 && _string[lastIndex] == ',') {
+                _string.setLength(lastIndex)
+            }
+        }
     }
 }

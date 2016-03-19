@@ -6,7 +6,7 @@ import com.intellij.lexer.LexerUtil
 import java.util.*
 
 class FormMacroSymbol(
-        val name: String?,
+        val name: String,
         val params: List<String>?,
         val substitution: String) {
 
@@ -15,7 +15,7 @@ class FormMacroSymbol(
             val contentLexer = FormLexer() // preprocessor should follow C rules in macros
             contentLexer.start(content)
 
-            while (WHITESPACES.contains(contentLexer.tokenType)) {
+            while (WHITE_SPACES.contains(contentLexer.tokenType)) {
                 contentLexer.advance()
             }
 
@@ -30,7 +30,7 @@ class FormMacroSymbol(
                 contentLexer.advance()
                 while (true) {
                     val t = contentLexer.tokenType
-                    if (t !== COMMA && t !== IDENTIFIER && !KEYWORDS.contains(t) && !WHITESPACES.contains(t)) break
+                    if (t !== COMMA && t !== IDENTIFIER && !KEYWORDS.contains(t) && !WHITE_SPACES.contains(t)) break
 
                     if (t === IDENTIFIER || KEYWORDS.contains(t)) {
                         var paramName = LexerUtil.getTokenText(contentLexer).toString()
@@ -48,7 +48,7 @@ class FormMacroSymbol(
                 params = null
             }
 
-            while (WHITESPACES.contains(contentLexer.tokenType)) {
+            while (WHITE_SPACES.contains(contentLexer.tokenType)) {
                 contentLexer.advance()
             }
 

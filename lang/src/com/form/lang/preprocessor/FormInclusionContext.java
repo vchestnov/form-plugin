@@ -21,16 +21,14 @@ public class FormInclusionContext {
 
     public void define(FormMacroSymbol def) {
         final String name = def.getName();
-        if (name == null) return;
-        if (!mySubstitutions.containsKey(def.getName())) {
-            mySubstitutions.put(def.getName(), new Stack<>());
+        if (!mySubstitutions.containsKey(name)) {
+            mySubstitutions.put(name, new Stack<>());
         }
-        mySubstitutions.get(def.getName()).push(def);
+        mySubstitutions.get(name).push(def);
     }
 
     public void redefine(@NotNull FormMacroSymbol def) {
         String name = def.getName();
-        if (name == null) return;
         if (!mySubstitutions.containsKey(name)) mySubstitutions.put(name, new Stack<>());
         if (!mySubstitutions.get(name).isEmpty()) mySubstitutions.get(name).pop();
         mySubstitutions.get(name).push(def);

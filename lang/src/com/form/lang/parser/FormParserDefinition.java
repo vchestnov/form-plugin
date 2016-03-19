@@ -1,6 +1,5 @@
 package com.form.lang.parser;
 
-import com.form.lang.lexer.FormLexer;
 import com.form.lang.lexer.FormTokens;
 import com.form.idea.FormLanguage;
 import com.form.lang.FormNodeType;
@@ -21,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class FormParserDefinition implements ParserDefinition {
     @NotNull @Override public TokenSet getWhitespaceTokens() {
-        return FormTokens.WHITESPACES;
+        return FormTokens.WHITE_SPACES;
     }
 
     @NotNull @Override public TokenSet getCommentTokens() {

@@ -2,9 +2,12 @@ package com.form.lang.parser;
 
 import com.form.lang.lexer.FormToken;
 import com.form.lang.lexer.FormTokens;
+import com.form.lang.preprocessor.FormMacroReferenceTokenType;
+import com.form.lang.util.FormElementUtilsKt;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
+import org.jetbrains.annotations.Nullable;
 
 import static com.form.lang.FormNodeTypes.*;
 import static com.form.lang.lexer.FormTokens.*;
@@ -84,15 +87,154 @@ public class AbstractFormParsing {
     }
 
     protected IElementType _tt() {
-        return builder.getTokenType();
+        IElementType base;
+        while(true) {
+            base = FormElementUtilsKt.getUnwrappedTokeType(builder.getTokenType());
+
+            if (WHITE_SPACES.contains(base))
+                builder.advanceLexer();
+            else
+                break;
+        }
+        return base;
     }
 
     protected IElementType tt() {
         IElementType token = builder.getTokenType();
         if (FormTokens.DIRECTIVES.contains(token)) {
             parseDirective();
+        } else if (token instanceof FormMacroReferenceTokenType) {
+//            FormMacroReferenceTokenType macroToken = (FormMacroReferenceTokenType) token;
+
+//            if (!myIsInsideMacro) {
+//                myIsInsideMacro = true;
+            parseMacroCall();
+//                myIsInsideMacro = false;
+//            } else {
+//                final IElementType delegate = macroToken.getDelegate();
+//                if (WHITESPACES.contains(delegate) || COMMENTS.contains(delegate) || delegate == EOL_ESCAPE)
+//                    baseAdvance();
+//                else
+//                    return delegate;
+//            }
         }
-        return builder.getTokenType();
+        return _tt();
+    }
+
+    @Nullable
+    private FormMacroReferenceTokenType asMacroToken() {
+        IElementType token = FormElementUtilsKt.getUnwrappedTokeType(_tt());
+        return token instanceof FormMacroReferenceTokenType ? (FormMacroReferenceTokenType) token : null;
+    }
+
+
+    private void parseMacroCall() {
+        FormMacroReferenceTokenType token = asMacroToken();
+        if (token == null || token.getDelegate() != BACKQUOTE) return;
+
+        PsiBuilder.Marker macroCall = mark();
+        _advance();
+
+        FormMacroReferenceTokenType rootToken = asMacroToken();
+        if (rootToken == null) {
+            macroCall.done(MACRO_CALL);
+            return;
+        }
+        IElementType rootTokenDelegate = rootToken.getDelegate();
+        if((rootTokenDelegate != IDENTIFIER && !KEYWORDS.contains(rootTokenDelegate)) || !rootToken.isRoot()){
+            builder.error("Macro name expected");
+            macroCall.done(MACRO_CALL);
+            return;
+        }
+        PsiBuilder.Marker ref = mark();
+        _advance();
+        ref.done(MACRO_REFERENCE);
+//        FormMacroReferenceTokenType token = asMacroToken();
+//
+//        if ((delegate != IDENTIFIER && !KEYWORDS.contains(delegate)) || !token.isRoot())
+//            return false;
+//
+//        myDisableErrors = true;
+//
+//        int level = token.getMacroLevel();
+//
+//        PsiBuilder.Marker macroCall = mark();
+//
+//        PsiBuilder.Marker ref = mark();
+//        baseAdvance();
+//        ref.done(MACRO_REF);
+//
+//        token = asMacroToken();
+//        PsiBuilder.Marker param = null;
+//
+//        while (token != null) {
+//            if (token.getMacroLevel() < level || token.isRoot()) break;
+//
+//            if (true /*myBuilder.getTokenType() instanceof OCMacroReferenceTokenType*/) { // Foreign tokens in recursive params won't be handled
+//                if (token.isParamToken() && param == null) {
+//                    param = mark();
+//                    int offset = myBuilder.getCurrentOffset();
+//                    boolean wasStatement = false;
+//
+//                    while (tryParseStatement() && myBuilder.getCurrentOffset() > offset) {
+//                        offset = myBuilder.getCurrentOffset();
+//                        wasStatement = true;
+//                    }
+//
+//                    if (wasStatement || detectTypeName() && parseTypeName(DeclarationContext.PARAMETER_LIST, TypeParsingExpectation.ANY) || parseAssignmentExpression(false)) {
+//                        OCMacroReferenceTokenType nextToken = asMacroToken();
+//
+//                        if (nextToken != null) {
+//                            token = nextToken;
+//                            continue;
+//                        }
+//                    }
+//
+//                    rollbackTo(param);
+//                    param = mark();
+//                } else if (!token.isParamToken()) {
+//                    IElementType tokenType = token.getDelegate();
+//
+//                    if ((tokenType == COMMA || tokenType == RPAR) && param == null)
+//                        param = mark();
+//                    if (param != null) {
+//                        param.done(MACRO_ARGUMENT);
+//                        param = null;
+//                    }
+//                }
+//            }
+//
+//            if (token.getMacroLevel() > level) {
+//                if (!parseMacroCall()) baseAdvance();
+//            } else {
+//                baseAdvance();
+//            }
+//
+//            token = asMacroToken();
+//        }
+//
+//        if (param != null)
+//            param.done(MACRO_ARGUMENT);
+//
+//        if (token == null) {
+//            IElementType foreignToken = baseToken();
+//
+//            while (foreignToken instanceof OCMacroReferenceTokenType) {
+//                if (((OCMacroReferenceTokenType) foreignToken).getMacroLevel() != level) break;
+//
+//                baseAdvance();
+//                foreignToken = baseToken();
+//            }
+//        }
+//
+        FormMacroReferenceTokenType closingQuote = asMacroToken();
+        if (closingQuote == null || closingQuote.getDelegate() != QUOTE) {
+            builder.error("' expected");
+            macroCall.done(MACRO_CALL);
+            return;
+        }
+        _advance();
+        macroCall.done(MACRO_CALL);
     }
 
     protected void parseDirective() {

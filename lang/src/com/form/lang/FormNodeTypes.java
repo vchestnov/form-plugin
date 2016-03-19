@@ -26,6 +26,7 @@ public interface FormNodeTypes {
     FormNodeType MACRO_REDEFINITION = new FormNodeType("MACRO_REDEFINITION", FormElementImpl.class);
     FormNodeType MACRO_UNDEFINITION = new FormNodeType("MACRO_UNDEFINITION", FormElementImpl.class);
     FormNodeType MACRO_REFERENCE = new FormNodeType("MACRO_REFERENCE", FormElementImpl.class);
+    FormNodeType MACRO_CALL = new FormNodeType("MACRO_CALL", FormElementImpl.class);
     FormNodeType STRING_LITERAL = new FormNodeType("STRING_LITERAL", FormElementImpl.class);
 
     FormNodeType BINARY_EXPRESSION = new FormNodeType("BINARY_EXPRESSION", FormBinaryExpressionImpl.class);
