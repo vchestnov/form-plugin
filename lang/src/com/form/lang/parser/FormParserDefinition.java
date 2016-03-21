@@ -33,7 +33,7 @@ public class FormParserDefinition implements ParserDefinition {
     @Override
     public Lexer createLexer(Project project) {
         FormInclusionContext inclusionContext = FormInclusionContext.empty();
-        return new FormPreprocessingLexer(inclusionContext);
+        return new FormPreprocessingLexer(inclusionContext, false);
     }
 
     @Override

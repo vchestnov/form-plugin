@@ -39,8 +39,7 @@ public class FormHighlighter extends SyntaxHighlighterBase {
         keys1.put(FormTokens.RPAR, FormHighlightingColors.PARENTHESIS);
         keys1.put(FormTokens.LBRACKET, FormHighlightingColors.BRACKETS);
         keys1.put(FormTokens.RBRACKET, FormHighlightingColors.BRACKETS);
-        keys1.put(FormTokens.OPEN_QUOTE, FormHighlightingColors.STRING);
+        keys1.put(FormTokens.DOUBLE_QUOTE, FormHighlightingColors.STRING);
         keys1.put(FormTokens.REGULAR_STRING_PART, FormHighlightingColors.STRING);
-        keys1.put(FormTokens.CLOSING_QUOTE, FormHighlightingColors.STRING);
     }
 }

@@ -12,7 +12,10 @@ import com.intellij.psi.tree.IElementType
 import com.intellij.util.containers.hash.HashMap
 import java.util.*
 
-class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAheadLexer(FormLexer()) {
+class FormPreprocessingLexer(
+        private val state: FormInclusionContext,
+        private val addTokensFromDirective: Boolean = false
+) : LookAheadLexer(FormLexer()) {
     var macroLevel = 0
 
 
@@ -27,12 +30,12 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
         } else if (baseToken == IFDEF_DIRECTIVE) {
             processIfDirective(baseLexer) { content: CharSequence ->
                 val identifier = content.toString().trim().removePrefix("`").removeSuffix("'")
-                myState.isDefined(identifier)
+                state.isDefined(identifier)
             }
         } else if (baseToken == IFNDEF_DIRECTIVE) {
             processIfDirective(baseLexer) { content: CharSequence ->
                 val identifier = content.toString().trim().removePrefix("`").removeSuffix("'")
-                myState.isUndefined(identifier)
+                state.isUndefined(identifier)
             }
         } else {
             super.lookAhead(baseLexer)
@@ -45,10 +48,10 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
         val macro: FormMacroSymbol?
         if (baseLexer.tokenType == IDENTIFIER) {
             val id = baseLexer.tokenText
-            macro = myState.getDefinition(id)
+            macro = state.getDefinition(id)
             skipMacroToken(baseLexer, false, true)
             buildSubstitutionArguments(baseLexer)
-        } else{
+        } else {
             macro = null
         }
 
@@ -56,21 +59,22 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             skipMacroToken(baseLexer, false, false)
         }
 
-        if (macro != null) {
-            val substLexer = FormPreprocessingLexer(myState)
-            val substString = macro.substitution
-            substLexer.start(substString, 0, substString.length)
-            while (true) {
-                val type = substLexer.tokenType ?: break
-                if (WHITE_SPACES.contains(type)) {
-                    addToken(baseLexer.tokenStart, type)
-                } else {
-                    val tokenText = LexerUtil.getTokenText(substLexer)
-                    val leafNode = FormMacroForeignLeafType(type, tokenText, macro.name)
-                    addToken(baseLexer.tokenStart, leafNode)
-                }
-                substLexer.advance()
+        if (macro == null) return
+        if (addTokensFromDirective) return
+
+        val substLexer = FormPreprocessingLexer(state)
+        val substString = macro.substitution
+        substLexer.start(substString, 0, substString.length)
+        while (true) {
+            val type = substLexer.tokenType ?: break
+            if (WHITE_SPACES.contains(type)) {
+                addToken(baseLexer.tokenStart, type)
+            } else {
+                val tokenText = LexerUtil.getTokenText(substLexer)
+                val leafNode = FormMacroForeignLeafType(type, tokenText, macro.name)
+                addToken(baseLexer.tokenStart, leafNode)
             }
+            substLexer.advance()
         }
     }
 
@@ -122,9 +126,9 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
             val def = FormMacroSymbol.parseFromDirectiveContent(content, offset)
             if (def != null) {
                 if (redefine) {
-                    myState.redefine(def)
+                    state.redefine(def)
                 } else {
-                    myState.define(def)
+                    state.define(def)
                 }
             }
         } else {
@@ -154,7 +158,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
                 l.advance()
             }
             if (l.tokenType === IDENTIFIER) {
-                myState.undef(LexerUtil.getTokenText(l).toString())
+                state.undef(LexerUtil.getTokenText(l).toString())
             }
         } else {
             addToken(lexer.tokenStart, END_OF_DIRECTIVE_CONTENT)
@@ -273,7 +277,7 @@ class FormPreprocessingLexer(private val myState: FormInclusionContext) : LookAh
     }
 
     private fun addTokensFromDirective(baseLexer: Lexer, content: CharSequence) {
-        val lexer = FormPreprocessingLexer(myState)
+        val lexer = FormPreprocessingLexer(state, addTokensFromDirective = true)
         lexer.start(content, 0, content.length, FormLexer.INITIAL)
 
         val tokenStart = baseLexer.tokenStart

@@ -312,7 +312,7 @@ public class AbstractFormParsing {
 
     private void parseStringLiteral() {
         PsiBuilder.Marker string = mark();
-        if (at(OPEN_QUOTE)) {
+        if (at(DOUBLE_QUOTE)) {
             _advance();
         } else {
             error("\" expected");
@@ -320,15 +320,16 @@ public class AbstractFormParsing {
             return;
         }
 
-        while (!eof() && !_at(CLOSING_QUOTE)) {
-            if (atSet(REGULAR_STRING_PART, MACRO_REFERENCE)) {
+        while (!eof() && !_at(DOUBLE_QUOTE)) {
+            IElementType token = builder.getTokenType();
+            if ( token instanceof FormMacroReferenceTokenType || token == REGULAR_STRING_PART) {
                 _advance();
             } else {
                 errorAndAdvance("Unexpected element");
             }
         }
 
-        if (at(CLOSING_QUOTE)) {
+        if (at(DOUBLE_QUOTE)) {
             _advance();
         }
         string.done(STRING_LITERAL);

@@ -3,11 +3,26 @@ package com.form.lang.lexer;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
+import java.util.Stack;
 
 %%
 
 %class _FormLexer
 %implements FlexLexer
+%{
+    private final Stack<Integer> states = new Stack<>();
+
+    private void pushState(int state) {
+        states.push(yystate());
+        yybegin(state);
+    }
+
+    private void popState() {
+        Integer state = states.pop();
+        yybegin(state);
+    }
+%}
+
 %unicode
 %function advance
 %type IElementType
@@ -16,6 +31,7 @@ import com.intellij.psi.TokenType;
 
 %state STRING
 %state DIRECTIVE
+%state MACRO_REFERENCE
 
 DIGIT=[0-9]
 
@@ -32,18 +48,19 @@ IDENTIFIER={PLAIN_IDENTIFIER}|{ESCAPED_IDENTIFIER}
 INTEGER_LITERAL={DECIMAL_INTEGER_LITERAL}
 DECIMAL_INTEGER_LITERAL=(0|([1-9]({DIGIT})*))
 
-REGULAR_STRING_PART=[^\"`']+
+REGULAR_STRING_PART=[^\"`\n]+
 
 DIRECTIVE_CONTENT=([^\n])*
 
 %%
 
 <DIRECTIVE> {DIRECTIVE_CONTENT} {return FormTokens.DIRECTIVE_CONTENT; }
-<DIRECTIVE> ({WHITE_SPACE_CHAR})+ { yybegin(YYINITIAL); return FormTokens.WHITE_SPACE; }
+<DIRECTIVE> ({WHITE_SPACE_CHAR})+ { popState(); return FormTokens.WHITE_SPACE; }
 
-<STRING> \"  { yybegin(YYINITIAL); return FormTokens.CLOSING_QUOTE; }
+<MACRO_REFERENCE> "'" { popState(); return FormTokens.QUOTE; }
 <STRING> {REGULAR_STRING_PART}  { return FormTokens.REGULAR_STRING_PART; }
-<YYINITIAL> \" { yybegin(STRING); return FormTokens.OPEN_QUOTE; }
+<STRING> \"  { popState(); return FormTokens.DOUBLE_QUOTE; }
+<YYINITIAL> \" { pushState(STRING); return FormTokens.DOUBLE_QUOTE; }
 
 ({WHITE_SPACE_CHAR})+ { return FormTokens.WHITE_SPACE; }
 ^{LINE_COMMENT} { return FormTokens.LINE_COMMENT; }
@@ -76,12 +93,12 @@ DIRECTIVE_CONTENT=([^\n])*
 "#commentchar" { return FormTokens.COMMENTCHAR_DIRECTIVE; }
 "#create" { return FormTokens.CREATE_DIRECTIVE; }
 "#default" { return FormTokens.DEFAULT_DIRECTIVE; }
-"#define" { yybegin(DIRECTIVE); return FormTokens.DEFINE_DIRECTIVE; }
+"#define" { pushState(DIRECTIVE); return FormTokens.DEFINE_DIRECTIVE; }
 "#do" { return FormTokens.DO_DIRECTIVE; }
-"#else" { yybegin(DIRECTIVE); return FormTokens.ELSE_DIRECTIVE; }
+"#else" { pushState(DIRECTIVE); return FormTokens.ELSE_DIRECTIVE; }
 "#elseif" { return FormTokens.ELSEIF_DIRECTIVE; }
 "#enddo" { return FormTokens.ENDDO_DIRECTIVE; }
-"#endif" { yybegin(DIRECTIVE); return FormTokens.ENDIF_DIRECTIVE; }
+"#endif" { pushState(DIRECTIVE); return FormTokens.ENDIF_DIRECTIVE; }
 "#endinside" { return FormTokens.ENDINSIDE_DIRECTIVE; }
 "#endprocedure" { return FormTokens.ENDPROCEDURE_DIRECTIVE; }
 "#endswitch" { return FormTokens.ENDSWITCH_DIRECTIVE; }
@@ -90,8 +107,8 @@ DIRECTIVE_CONTENT=([^\n])*
 "#factdollar" { return FormTokens.FACTDOLLAR_DIRECTIVE; }
 "#fromexternal" { return FormTokens.FROMEXTERNAL_DIRECTIVE; }
 "#if" { return FormTokens.IF_DIRECTIVE; }
-"#ifdef" { yybegin(DIRECTIVE); return FormTokens.IFDEF_DIRECTIVE; }
-"#ifndef" { yybegin(DIRECTIVE); return FormTokens.IFNDEF_DIRECTIVE; }
+"#ifdef" { pushState(DIRECTIVE); return FormTokens.IFDEF_DIRECTIVE; }
+"#ifndef" { pushState(DIRECTIVE); return FormTokens.IFNDEF_DIRECTIVE; }
 "#include" { return FormTokens.INCLUDE_DIRECTIVE; }
 "#inside" { return FormTokens.INSIDE_DIRECTIVE; }
 "#message" { return FormTokens.MESSAGE_DIRECTIVE; }
@@ -103,7 +120,7 @@ DIRECTIVE_CONTENT=([^\n])*
 "#procedure" { return FormTokens.PROCEDURE_DIRECTIVE; }
 "#procedureextension" { return FormTokens.PROCEDUREEXTENSION_DIRECTIVE; }
 "#prompt" { return FormTokens.PROMPT_DIRECTIVE; }
-"#redefine" { yybegin(DIRECTIVE); return FormTokens.REDEFINE_DIRECTIVE; }
+"#redefine" { pushState(DIRECTIVE); return FormTokens.REDEFINE_DIRECTIVE; }
 "#remove" { return FormTokens.REMOVE_DIRECTIVE; }
 "#reset" { return FormTokens.RESET_DIRECTIVE; }
 "#reverseinclude" { return FormTokens.REVERSEINCLUDE_DIRECTIVE; }
@@ -118,7 +135,7 @@ DIRECTIVE_CONTENT=([^\n])*
 "#system" { return FormTokens.SYSTEM_DIRECTIVE; }
 "#terminate" { return FormTokens.TERMINATE_DIRECTIVE; }
 "#toexternal" { return FormTokens.TOEXTERNAL_DIRECTIVE; }
-"#undefine" { yybegin(DIRECTIVE); return FormTokens.UNDEFINE_DIRECTIVE; }
+"#undefine" { pushState(DIRECTIVE); return FormTokens.UNDEFINE_DIRECTIVE; }
 "#usedictionary" { return FormTokens.USEDICTIONARY_DIRECTIVE; }
 "#write" { return FormTokens.WRITE_DIRECTIVE; }
 
@@ -150,8 +167,10 @@ DIRECTIVE_CONTENT=([^\n])*
 ","          { return FormTokens.COMMA     ; }
 ";"          { return FormTokens.SEMICOLON ; }
 "?"          { return FormTokens.QUEST     ; }
-"`"          { return FormTokens.BACKQUOTE ; }
-"'"          { return FormTokens.QUOTE     ; }
+
+<STRING, YYINITIAL> "`" { pushState(MACRO_REFERENCE); return FormTokens.BACKQUOTE; }
+<MACRO_REFERENCE> "'"   { popState(); return FormTokens.QUOTE; }
+<YYINITIAL> "'" { return FormTokens.QUOTE; }
 "~"          { return FormTokens.TYLDA     ; }
 
-<YYINITIAL, DIRECTIVE> . { yybegin(YYINITIAL); return TokenType.BAD_CHARACTER; }
+<YYINITIAL, DIRECTIVE, STRING, MACRO_REFERENCE> . { return TokenType.BAD_CHARACTER; }
