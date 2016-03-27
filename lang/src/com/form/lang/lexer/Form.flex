@@ -57,7 +57,10 @@ DIRECTIVE_CONTENT=([^\n])*
 <DIRECTIVE> {DIRECTIVE_CONTENT} {return FormTokens.DIRECTIVE_CONTENT; }
 <DIRECTIVE> ({WHITE_SPACE_CHAR})+ { popState(); return FormTokens.WHITE_SPACE; }
 
-<MACRO_REFERENCE> "'" { popState(); return FormTokens.QUOTE; }
+<STRING, YYINITIAL, MACRO_REFERENCE> "`" { pushState(MACRO_REFERENCE); return FormTokens.BACKQUOTE; }
+<MACRO_REFERENCE> "'"   { popState(); return FormTokens.QUOTE; }
+<YYINITIAL> "'" { return FormTokens.QUOTE; }
+
 <STRING> {REGULAR_STRING_PART}  { return FormTokens.REGULAR_STRING_PART; }
 <STRING> \"  { popState(); return FormTokens.DOUBLE_QUOTE; }
 <YYINITIAL> \" { pushState(STRING); return FormTokens.DOUBLE_QUOTE; }
@@ -167,10 +170,6 @@ DIRECTIVE_CONTENT=([^\n])*
 ","          { return FormTokens.COMMA     ; }
 ";"          { return FormTokens.SEMICOLON ; }
 "?"          { return FormTokens.QUEST     ; }
-
-<STRING, YYINITIAL> "`" { pushState(MACRO_REFERENCE); return FormTokens.BACKQUOTE; }
-<MACRO_REFERENCE> "'"   { popState(); return FormTokens.QUOTE; }
-<YYINITIAL> "'" { return FormTokens.QUOTE; }
 "~"          { return FormTokens.TYLDA     ; }
 
 <YYINITIAL, DIRECTIVE, STRING, MACRO_REFERENCE> . { return TokenType.BAD_CHARACTER; }
