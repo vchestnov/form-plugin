@@ -2,6 +2,7 @@ package com.form.lang.preprocessor
 
 import com.form.lang.lexer.FormLexer
 import com.form.lang.lexer.FormTokens.*
+import com.intellij.lang.TokenWrapper
 import com.intellij.lexer.Lexer
 import com.intellij.lexer.LexerPosition
 import com.intellij.lexer.LexerUtil
@@ -14,7 +15,8 @@ import java.util.*
 
 class FormPreprocessingLexer(
         private val state: FormInclusionContext,
-        private val addTokensFromDirective: Boolean = false
+        private val processLazyReferences: Boolean,
+        private val addTokensFromDirective: Boolean
 ) : LookAheadLexer(FormLexer()) {
     var macroLevel = 0
 
@@ -43,10 +45,25 @@ class FormPreprocessingLexer(
     }
 
     private fun processMacroSubstitution(baseLexer: Lexer) {
-        skipMacroToken(baseLexer, false, false) //skip backquote
+        val pos = baseLexer.currentPosition
+        baseLexer.advance()
+
+        if (baseLexer.tokenType == TYLDA && !processLazyReferences) {
+            baseLexer.restore(pos);
+            var currentToken = baseLexer.tokenType
+            while (currentToken !== null && currentToken !== QUOTE) {
+                advanceAs(baseLexer, currentToken)
+                currentToken = baseLexer.tokenType
+            }
+            return
+        } else {
+            baseLexer.restore(pos)
+            skipMacroToken(baseLexer, false, false) //skip backquote
+            skipMacroToken(baseLexer, false, false) //skip tylda
+        }
 
         val macro: FormMacroSymbol?
-        if (baseLexer.tokenType == IDENTIFIER) {
+        if (baseLexer.tokenType === IDENTIFIER) {
             val id = baseLexer.tokenText
             macro = state.getDefinition(id)
             skipMacroToken(baseLexer, false, true)
@@ -62,7 +79,7 @@ class FormPreprocessingLexer(
         if (macro == null) return
         if (addTokensFromDirective) return
 
-        val substLexer = FormPreprocessingLexer(state)
+        val substLexer = FormPreprocessingLexer(state, processLazyReferences, false);
         val substString = macro.substitution
         substLexer.start(substString, 0, substString.length)
         while (true) {
@@ -122,8 +139,9 @@ class FormPreprocessingLexer(
         advanceLexer(baseLexer)
         if (atDirectiveContent(baseLexer)) {
             val content = LexerUtil.getTokenText(baseLexer)
+            val processedContent = processSubstitutions(content);
             addTokensFromDirective(baseLexer, content)
-            val def = FormMacroSymbol.parseFromDirectiveContent(content, offset)
+            val def = FormMacroSymbol.parseFromDirectiveContent(processedContent, offset)
             if (def != null) {
                 if (redefine) {
                     state.redefine(def)
@@ -276,8 +294,36 @@ class FormPreprocessingLexer(
         }
     }
 
+    private fun processSubstitutions(content: CharSequence): String {
+        val lexer = FormPreprocessingLexer(
+                state,
+                processLazyReferences = false,
+                addTokensFromDirective = false
+        );
+        lexer.start(content, 0, content.length, FormLexer.INITIAL)
+        val preprocessedContent = StringBuilder();
+
+        var currentToken = lexer.tokenType
+        while (currentToken != null) {
+            when (currentToken) {
+                is FormMacroReferenceTokenType -> {
+                }
+                is TokenWrapper -> {
+                    preprocessedContent.append(currentToken.value)
+                }
+                else -> {
+                    preprocessedContent.append(LexerUtil.getTokenText(lexer))
+                }
+            }
+            lexer.advance()
+            currentToken = lexer.tokenType
+        }
+
+        return preprocessedContent.toString()
+    }
+
     private fun addTokensFromDirective(baseLexer: Lexer, content: CharSequence) {
-        val lexer = FormPreprocessingLexer(state, addTokensFromDirective = true)
+        val lexer = FormPreprocessingLexer(state, processLazyReferences = true, addTokensFromDirective = true)
         lexer.start(content, 0, content.length, FormLexer.INITIAL)
 
         val tokenStart = baseLexer.tokenStart
