@@ -291,8 +291,14 @@ public class AbstractFormParsing {
                 }
                 parseStringLiteral();
             }
-
-            expect(END_OF_DIRECTIVE_CONTENT, "End of directive expected");
+            while (!eof() && !isEndOfDirective(tt())) {
+                if(WHITE_SPACES.contains(tt())) {
+                    _advance();
+                } else {
+                    errorAndAdvance("Unexpected element");
+                }
+            }
+            _advance();
             if (headerToken == DEFINE_DIRECTIVE) {
                 marker.done(MACRO_DEFINITION);
             } else if (headerToken == REDEFINE_DIRECTIVE) {
@@ -312,7 +318,7 @@ public class AbstractFormParsing {
 
     private void parseStringLiteral() {
         PsiBuilder.Marker string = mark();
-        if (at(DOUBLE_QUOTE)) {
+        if (at(OPENING_QUOTE)) {
             _advance();
         } else {
             error("\" expected");
@@ -320,7 +326,7 @@ public class AbstractFormParsing {
             return;
         }
 
-        while (!eof() && !_at(DOUBLE_QUOTE)) {
+        while (!eof() && !_at(CLOSING_QUOTE)) {
             IElementType token = builder.getTokenType();
             if ( token instanceof FormMacroReferenceTokenType || token == REGULAR_STRING_PART) {
                 _advance();
@@ -329,7 +335,7 @@ public class AbstractFormParsing {
             }
         }
 
-        if (at(DOUBLE_QUOTE)) {
+        if (at(CLOSING_QUOTE)) {
             _advance();
         }
         string.done(STRING_LITERAL);

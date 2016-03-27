@@ -49,7 +49,7 @@ class FormPreprocessingLexer(
         baseLexer.advance()
 
         if (baseLexer.tokenType == TYLDA && !processLazyReferences) {
-            baseLexer.restore(pos);
+            addToken(BACKQUOTE)
             var currentToken = baseLexer.tokenType
             while (currentToken !== null && currentToken !== QUOTE) {
                 advanceAs(baseLexer, currentToken)
@@ -57,8 +57,7 @@ class FormPreprocessingLexer(
             }
             return
         } else {
-            baseLexer.restore(pos)
-            skipMacroToken(baseLexer, false, false) //skip backquote
+            addToken(FormMacroReferenceTokenType(BACKQUOTE, "`", false, macroLevel, false))
             skipMacroToken(baseLexer, false, false) //skip tylda
         }
 
@@ -67,7 +66,7 @@ class FormPreprocessingLexer(
             val id = baseLexer.tokenText
             macro = state.getDefinition(id)
             skipMacroToken(baseLexer, false, true)
-            buildSubstitutionArguments(baseLexer)
+//            buildSubstitutionArguments(baseLexer)
         } else {
             macro = null
         }

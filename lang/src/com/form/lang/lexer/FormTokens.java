@@ -100,7 +100,8 @@ public interface FormTokens {
 
     FormToken DIRECTIVE_CONTENT = new FormToken("DIRECTIVE_CONTENT");
     FormToken END_OF_DIRECTIVE_CONTENT = new FormToken("END_OF_DIRECTIVE_CONTENT");
-    FormToken DOUBLE_QUOTE = new FormToken("DOUBLE_QUOTE");
+    FormToken OPENING_QUOTE = new FormToken("OPENING_QUOTE");
+    FormToken CLOSING_QUOTE = new FormToken("CLOSING_QUOTE");
     FormToken REGULAR_STRING_PART = new FormToken("REGULAR_STRING_PART");
 
     FormSingleValueToken LBRACKET = new FormSingleValueToken("LBRACKET", "[");

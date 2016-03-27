@@ -62,8 +62,8 @@ DIRECTIVE_CONTENT=([^\n])*
 <YYINITIAL> "'" { return FormTokens.QUOTE; }
 
 <STRING> {REGULAR_STRING_PART}  { return FormTokens.REGULAR_STRING_PART; }
-<STRING> \"  { popState(); return FormTokens.DOUBLE_QUOTE; }
-<YYINITIAL> \" { pushState(STRING); return FormTokens.DOUBLE_QUOTE; }
+<STRING> \"  { popState(); return FormTokens.CLOSING_QUOTE; }
+<YYINITIAL> \" { pushState(STRING); return FormTokens.OPENING_QUOTE; }
 
 ({WHITE_SPACE_CHAR})+ { return FormTokens.WHITE_SPACE; }
 ^{LINE_COMMENT} { return FormTokens.LINE_COMMENT; }

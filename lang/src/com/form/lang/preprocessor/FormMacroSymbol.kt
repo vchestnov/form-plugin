@@ -52,10 +52,10 @@ class FormMacroSymbol(
                 contentLexer.advance()
             }
 
-            if (contentLexer.tokenType === DOUBLE_QUOTE) contentLexer.advance()
+            if (contentLexer.tokenType === OPENING_QUOTE) contentLexer.advance()
 
             val replacement = StringBuilder()
-            while (contentLexer.tokenType != DOUBLE_QUOTE && contentLexer.tokenType != null) {
+            while (contentLexer.tokenType != CLOSING_QUOTE && contentLexer.tokenType != null) {
                 val token = LexerUtil.getTokenText(contentLexer)
                 replacement.append(token)
                 contentLexer.advance()
