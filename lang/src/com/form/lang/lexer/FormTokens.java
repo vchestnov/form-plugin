@@ -115,7 +115,7 @@ public interface FormTokens {
     FormSingleValueToken EQ = new FormSingleValueToken("EQ", "=");
     FormSingleValueToken EQEQ = new FormSingleValueToken("EQEQ", "==");
     FormSingleValueToken QUEST = new FormSingleValueToken("QUEST", "?");
-    FormSingleValueToken TYLDA = new FormSingleValueToken("QUEST", "?");
+    FormSingleValueToken TYLDA = new FormSingleValueToken("TYLDA", "?");
     FormSingleValueToken QUOTE = new FormSingleValueToken("QUOTE", "'");
     FormSingleValueToken BACKQUOTE = new FormSingleValueToken("BACKQUOTE", "`");
 
