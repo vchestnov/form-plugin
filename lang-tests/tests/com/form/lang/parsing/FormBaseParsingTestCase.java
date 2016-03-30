@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class FormBaseParsingTestCase extends ParsingTestCase {
     @Override
     protected String getTestDataPath() {
-//        TODO: this is correct way of doing things
+//        TODO: this is the correct way of doing things
         return FormTestDataFixture.getLangTestData() + "/psi";
 //        TODO: this is not cool
 //        return FormTestDataFixture.getHomeDirectory();

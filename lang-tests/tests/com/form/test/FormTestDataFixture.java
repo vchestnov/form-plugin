@@ -13,6 +13,7 @@ public class FormTestDataFixture {
     }
 
     public static String getHomeDirectory() {
+//        TODO: change this
         File resourceRoot = PathUtil.getResourcePathForClass(FormTestDataFixture.class);
         File f1 = resourceRoot.getParentFile();
         File f2 = f1.getParentFile();

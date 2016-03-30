@@ -13,6 +13,10 @@ public class FormParsingTest extends FormBaseParsingTestCase {
         }
 //    }
     public void testFirstTest() throws Exception {
-        doTest(true);
+//        doTest(true);
+        String name = this.getTestName();
+        String e = this.loadFile(name + "." + this.myFileExt);
+        this.myFile = this.createPsiFile(name, e);
+        this.checkResult(name, this.myFile);
     }
 }
