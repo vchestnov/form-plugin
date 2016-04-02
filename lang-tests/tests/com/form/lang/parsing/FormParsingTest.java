@@ -6,17 +6,17 @@ import com.form.test.FormTestDataFixture;
 public class FormParsingTest extends FormBaseParsingTestCase {
 //    public static class Psi extends FormBaseParsingTestCase {
         public void testAbsentInnerType() throws Exception {
-            String fileName = FormTestDataFixture.navigationMetadata("FirstTest.frm");
+            String fileName = FormTestDataFixture.navigationMetadata("SimpleTest.frm");
             doParsingTest(fileName);
 //          TODO: use this method from ParsingTestCase
 //            doTest(true);
         }
 //    }
-    public void testFirstTest() throws Exception {
-//        doTest(true);
-        String name = this.getTestName();
-        String e = this.loadFile(name + "." + this.myFileExt);
-        this.myFile = this.createPsiFile(name, e);
-        this.checkResult(name, this.myFile);
+    public void testSimpleTest() throws Exception {
+        doTest(true);
+    }
+
+    public void testMacrosTest() throws Exception {
+        doTest(true);
     }
 }

@@ -1,0 +1,7 @@
+FILE(0,8)
+  FormPrintStatement(PRINT)(0,8)
+    PsiElement(Print)('Print')(0,5)
+    PsiWhiteSpace(' ')(5,6)
+    FormReferenceExpressionImpl(REFERENCE_EXPRESSION)(6,7)
+      PsiElement(IDENTIFIER)('a')(6,7)
+    PsiElement(SEMICOLON)(';')(7,8)
