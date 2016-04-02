@@ -19,6 +19,11 @@ public abstract class FormBaseParsingTestCase extends ParsingTestCase {
 //        return FormTestDataFixture.getHomeDirectory();
     }
 
+    @Override
+    protected boolean includeRanges() {
+        return true;
+    }
+
     protected FormBaseParsingTestCase() {
         super(".", "frm", new FormParserDefinition());
     }
